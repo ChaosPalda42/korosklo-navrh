@@ -1,0 +1,13 @@
+{
+  "id": "C-003",
+  "file": "src/lib/sklad.mjs",
+  "role": "coder",
+  "title": "Skladová evidence — stav karty, pohyby, podlimitní zásoby",
+  "interface": "Karta = { kod, nazev, jednotka, naSklade, rezervovano, limit, cena }. Čísla mohou chybět — ber je pak jako 0.\n\nexport function stavKarty(karta) -> { naSklade, rezervovano, volne }\n  volne = naSklade - rezervovano, zaokr2.\n\nexport function pohybem(karta, pohyb) -> nová karta\n  pohyb = { druh, mnozstvi }. Vrací MĚLKOU KOPII karty se změněnými čísly; vstupní kartu nesmí změnit. Nekladné nebo nečíselné `mnozstvi` -> throw new Error s českou větou o tom, že množství musí být kladné. Neznámý `druh` -> throw new Error, který ten druh zmíní. Druhy:\n  - \"prijem\": naSklade += mnozstvi.\n  - \"vydej\": když mnozstvi > naSklade, throw new Error, jehož text obsahuje dostupné množství zapsané s desetinnou ČÁRKOU (např. \"42,5\"). Jinak naSklade -= mnozstvi a rezervovano = Math.max(0, rezervovano - mnozstvi).\n  - \"rezervace\": když mnozstvi > volne (tedy naSklade - rezervovano), throw new Error s dostupným volným množstvím. Jinak rezervovano += mnozstvi.\n  - \"zruseni-rezervace\": rezervovano = Math.max(0, rezervovano - mnozstvi).\n  Všechna výsledná čísla projdou zaokr2.\n\nexport function podLimitem(karty) -> pole karet\n  Karty, kde volne < limit, seřazené VZESTUPNĚ podle (volne - limit), tedy nejhorší schodek první. Vrací původní objekty karet, ne kopie. Prázdný vstup -> [].\n\nexport function hodnotaSkladu(karty) -> number\n  zaokr2 součtu naSklade * cena přes všechny karty.",
+  "uses": {},
+  "acceptance": "tests/test_sklad.py",
+  "notes": "ESM modul BEZ jakýchkoli importů. Musí běžet v Node 24 i v prohlížeči: žádné `require`, žádné Node API (fs, path, process), žádné DOM API (document, window, localStorage), žádné knihovny. Jen čistý JavaScript a standardní vestavěné objekty. Datum je vždycky řetězec ve tvaru RRRR-MM-DD; počítej s ním přes Date.UTC, ať se do výsledku nepromítne časové pásmo ani letní čas. Peníze zaokrouhluj funkcí zaokr2(x) = Math.round((x + Number.EPSILON) * 100) / 100 a zápornou nulu převeď na 0.",
+  "budget": {
+    "iterations": 12
+  }
+}

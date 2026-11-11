@@ -1,0 +1,13 @@
+{
+  "id": "C-004",
+  "file": "src/lib/faktura.mjs",
+  "role": "coder",
+  "title": "Faktury — vznik z nabídky, splatnost, stav, přehled",
+  "interface": "Faktura = { cislo, variabilniSymbol, zNabidky, zakaznik, polozky, vystaveno, splatnost, stav, celkem? }. `stav` je \"navrh\", \"vystavena\" nebo \"zaplacena\".\n\nexport function zNabidky(nabidka, volby) -> faktura\n  volby = { cislo, vystaveno, splatnostDnu = 14 }. Vrátí novou fakturu:\n  cislo z voleb, variabilniSymbol = variabilniSymbol(cislo), zNabidky = nabidka.cislo, zakaznik a polozky HLUBOKOU kopií z nabídky (změna ve faktuře se nesmí projevit v nabídce), vystaveno z voleb, splatnost = vystaveno posunuté o splatnostDnu dní, stav = \"navrh\".\n\nexport function variabilniSymbol(cislo) -> string\n  Z řetězce vybere jen číslice; je-li jich víc než deset, vrátí POSLEDNÍCH deset. Žádná číslice -> \"\".\n\nexport function stavFaktury(faktura, dnesIso) -> string\n  \"zaplacena\" a \"navrh\" vrací beze změny. Jinak: dnesIso po splatnosti -> \"po-splatnosti\", den splatnosti i dřív -> \"vystavena\".\n\nexport function dnuPoSplatnosti(faktura, dnesIso) -> number\n  Kolik celých dní je faktura po splatnosti. Není-li stavFaktury(...) rovno \"po-splatnosti\", vrací 0.\n\nexport function prehled(faktury, dnesIso) -> objekt\n  { zaplaceno, nezaplaceno, poSplatnosti, pocty }. Každou fakturu zařaď podle stavFaktury(f, dnesIso) a sčítej f.celkem (chybí -> 0):\n  - zaplaceno: součet faktur ve stavu \"zaplacena\".\n  - nezaplaceno: součet faktur ve stavu \"vystavena\" a \"po-splatnosti\" (návrhy se nepočítají).\n  - poSplatnosti: součet faktur ve stavu \"po-splatnosti\".\n  - pocty: objekt s počty { navrh, vystavena, \"po-splatnosti\", zaplacena }; všechny čtyři klíče tam jsou vždycky, i s nulou.\n  Součty projdou zaokr2.",
+  "uses": {},
+  "acceptance": "tests/test_faktura.py",
+  "notes": "ESM modul BEZ jakýchkoli importů. Musí běžet v Node 24 i v prohlížeči: žádné `require`, žádné Node API (fs, path, process), žádné DOM API (document, window, localStorage), žádné knihovny. Jen čistý JavaScript a standardní vestavěné objekty. Datum je vždycky řetězec ve tvaru RRRR-MM-DD; počítej s ním přes Date.UTC, ať se do výsledku nepromítne časové pásmo ani letní čas. Peníze zaokrouhluj funkcí zaokr2(x) = Math.round((x + Number.EPSILON) * 100) / 100 a zápornou nulu převeď na 0. Hlubokou kopii dělej přes structuredClone nebo JSON.parse(JSON.stringify(x)).",
+  "budget": {
+    "iterations": 12
+  }
+}

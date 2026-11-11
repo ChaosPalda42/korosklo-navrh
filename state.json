@@ -1,0 +1,53 @@
+{
+  "contracts": {
+    "C-001": {
+      "status": "green",
+      "attempts": 1,
+      "iterations": 4,
+      "commit": "778c2f6",
+      "last_finding": "",
+      "packet": "",
+      "updated_at": "2026-11-11T14:21:07+00:00"
+    },
+    "C-002": {
+      "status": "green",
+      "attempts": 1,
+      "iterations": 3,
+      "commit": "41dd971",
+      "last_finding": "",
+      "packet": "",
+      "updated_at": "2026-11-11T14:23:31+00:00"
+    },
+    "C-003": {
+      "status": "green",
+      "attempts": 1,
+      "iterations": 11,
+      "commit": "2a05587",
+      "last_finding": "",
+      "packet": "",
+      "updated_at": "2026-11-11T14:53:02+00:00"
+    },
+    "C-004": {
+      "status": "green",
+      "attempts": 1,
+      "iterations": 3,
+      "commit": "90c2ae0",
+      "last_finding": "",
+      "packet": "",
+      "updated_at": "2026-11-11T14:57:17+00:00"
+    }
+  },
+  "runs": [
+    {
+      "started_at": "2026-11-11T14:15:57+00:00",
+      "finished_at": "2026-11-11T14:57:21+00:00",
+      "outcome": "green",
+      "iterations": 21,
+      "green": 4,
+      "red": 0,
+      "escalated": 0,
+      "note": "test_command passed (53 tests)"
+    }
+  ],
+  "open_packets": []
+}
