@@ -10,6 +10,8 @@ import { cislo, koruny, sMnoznym, datum, datumKratce, pred, dnuMezi } from "../l
 import { polozkaCelkem, souhrn, stavPlatnosti } from "../lib/nabidka.mjs";
 import { stavKarty, podLimitem, hodnotaSkladu } from "../lib/sklad.mjs";
 import { stavFaktury, dnuPoSplatnosti, prehled, variabilniSymbol } from "../lib/faktura.mjs";
+import { postup, pocty, serad, jeVBehu } from "../lib/zakazky.mjs";
+import { kdy } from "../lib/kdy.mjs";
 import { ikona, karta, odznak, poznamka, popis, tabulka, rozbal, prazdno } from "./admin-layout.mjs";
 
 const FAZE = "Druhá fáze — <strong>samostatná zakázka</strong>. Takhle by mohlo vypadat "
@@ -392,44 +394,38 @@ export function nabidkaDetail(ctx, n) {
 /* --------------------------------------------------------------- zakázky */
 
 export function zakazky(ctx) {
-  const { demo, stranka, dnes } = ctx;
+  const { demo, dnes } = ctx;
+  const p = pocty(demo.zakazky);
+  const radky = serad(demo.zakazky, dnes).map((z) => zakazkaRadek(ctx, z)).join("");
 
-  const radky = demo.zakazky.map((z) => {
-    const k = klient(ctx, z.klient);
-    const hotovych = z.kroky.filter(([, , hotovo]) => hotovo).length;
-    const dalsi = z.kroky.find(([, , hotovo]) => !hotovo);
+  const volba = (hodnota, nazev, kolik, stisknuto) =>
+    `<button class="volba" type="button" data-hodnota="${h(hodnota)}"`
+    + ` aria-pressed="${stisknuto ? "true" : "false"}">${h(nazev)}`
+    + `<span class="volba__pocet" data-pocet="${h(hodnota || "vse")}">${cislo(kolik)}</span></button>`;
 
-    const hlavni = `<strong>${h(z.id)} — ${h(z.nazev)}</strong>`
-      + `<span class="tabulka__pod">${h(k?.jmeno ?? "—")}</span>`;
-    const vedle = `${hotovych}/${z.kroky.length} kroků`
-      + odznakZeSlovniku(STAVY_ZAKAZEK, z.stav);
+  const filtr = `<div class="filtry netisknout">
+  <label class="jen-pro-cteni" for="hledat-z">Hledat zakázku</label>
+  <input type="search" id="hledat-z" placeholder="Číslo, klient, co se dělá…"
+         data-hledat-z="#seznam-zakazek">
+  <div class="volby" data-filtr-z="#seznam-zakazek">`
+    + volba("priprava,vyroba,montaz", "V běhu", p.vBehu, true)
+    + volba("hotovo", "Hotové", p.hotove, false)
+    + volba("", "Všechny", p.celkem, false)
+    + `</div>
+  <button class="tl tl--hlavni" type="button" data-nova-zakazka>${ikona("pridat")} Nová zakázka</button>
+</div>`;
 
-    const postup = `<ol class="postup">`
-      + z.kroky.map(([nazev, kdy, hotovo], i) => {
-        const ted = !hotovo && dalsi && dalsi[0] === nazev;
-        return `<li${hotovo ? " data-hotovo" : ""}${ted ? " data-ted" : ""}>`
-          + `<span class="postup__znak">${hotovo ? ikona("fajfka") : i + 1}</span>`
-          + `<span>${h(nazev)}</span>`
-          + `<span class="postup__kdy">${h(datumKratce(kdy))}</span></li>`;
-      }).join("")
-      + `</ol>`;
-
-    const telo = popis([
-      ["Klient", k
-        ? `<a href="${odkaz(stranka, "administrace/crm/klienti.html")}#${h(k.id)}">${h(k.jmeno)}</a>`
-        : "—"],
-      ["Z nabídky", z.nabidka
-        ? `<a href="${odkaz(stranka, `administrace/crm/nabidka-${z.nabidka}.html`)}">${h(z.nabidka)}</a>`
-        : "—"],
-      ["Zahájeno", h(datum(z.zahajeno))],
-      ["Montáž", `${h(datum(z.terminMontaze))} <span class="tabulka__pod">${h(pred(z.terminMontaze, dnes))}</span>`],
-      ...(z.poznamka ? [["Poznámka", h(z.poznamka)]] : []),
-    ], { sloupce: true })
-      + `<p class="ryska" style="margin-top:1.25rem">Kde to stojí</p>`
-      + postup;
-
-    return rozbal({ hlavni, vedle, telo, otevreno: z.stav !== "hotovo" });
-  }).join("");
+  const telo = filtr + karta({
+    nadpis: "Zakázky",
+    vedle: `<span class="karta__pocet" data-videt>${cislo(p.vBehu)} v běhu</span>`,
+    telo: `<div id="seznam-zakazek" data-stavy="priprava,vyroba,montaz">${radky}</div>`
+      + `<div class="prazdno" data-prazdno hidden>${ikona("hledat")}`
+      + `<strong>Žádná zakázka tomu neodpovídá</strong>`
+      + `<p>Zkuste jiný filtr nebo jiné slovo.</p></div>`,
+    tesne: true,
+    pata: "Hotové zakázky se schovají samy — filtr nahoře je kdykoli vytáhne zpátky. "
+      + "Stav se dá přepnout přímo v řádku, krok odškrtnout kliknutím.",
+  });
 
   return {
     titulek: "Zakázky",
@@ -439,8 +435,103 @@ export function zakazky(ctx) {
     cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
       { nazev: "CRM", kam: "administrace/crm/index.html" }, { nazev: "Zakázky" }],
     faze: FAZE,
-    telo: karta({ nadpis: `Zakázky (${demo.zakazky.length})`, telo: radky, tesne: true }),
+    telo,
   };
+}
+
+/** Jeden rozkládací řádek zakázky i s úpravami, stavem a mazáním. */
+function zakazkaRadek(ctx, z) {
+  const { stranka, dnes } = ctx;
+  const k = klient(ctx, z.klient);
+  const stav = postup(z);
+
+  const hlavni = `<strong>${h(z.id)} — <span data-zobraz="nazev">${h(z.nazev)}</span></strong>`
+    + `<span class="tabulka__pod">${h(k?.jmeno ?? "—")}</span>`;
+  const vedle = (jeVBehu(z) && z.terminMontaze
+    ? `<span class="tabulka__pod">montáž ${h(kdy(z.terminMontaze, dnes))}</span>` : "")
+    + `<span data-kroky>${stav.hotovych}/${stav.celkem} kroků</span>`
+    + `<span data-odznak>${odznakZeSlovniku(STAVY_ZAKAZEK, z.stav)}</span>`;
+
+  const postupHtml = `<ol class="postup" data-postup>`
+    + z.kroky.map(([nazev, kdy, hotovo], i) => {
+      const ted = !hotovo && stav.dalsi && stav.dalsi[0] === nazev;
+      return `<li${hotovo ? " data-hotovo" : ""}${ted ? " data-ted" : ""}>`
+        + `<button type="button" class="postup__znak" data-krok="${i}"`
+        + ` aria-pressed="${hotovo ? "true" : "false"}"`
+        + ` title="${hotovo ? "Odškrtnout krok" : "Odškrtnout jako hotový"}">`
+        + `${hotovo ? ikona("fajfka") : i + 1}</button>`
+        + `<span>${h(nazev)}</span>`
+        + `<span class="postup__kdy">${h(datumKratce(kdy))}</span></li>`;
+    }).join("")
+    + `</ol>`;
+
+  const prehledHtml = `<div data-zobrazeni>` + popis([
+    ["Klient", k
+      ? `<a href="${odkaz(stranka, "administrace/crm/klienti.html")}#${h(k.id)}">${h(k.jmeno)}</a>`
+      : "—"],
+    ["Z nabídky", z.nabidka
+      ? `<a href="${odkaz(stranka, `administrace/crm/nabidka-${z.nabidka}.html`)}">${h(z.nabidka)}</a>`
+      : "—"],
+    ["Zahájeno", h(datum(z.zahajeno))],
+    ["Montáž", `<span data-zobraz="terminDatum">${h(datum(z.terminMontaze))}</span> `
+      + `<span class="tabulka__pod" data-zobraz="terminPred">${h(kdy(z.terminMontaze, dnes))}</span>`],
+    ["Poznámka", `<span data-zobraz="poznamka">${h(z.poznamka || "—")}</span>`],
+  ], { sloupce: true }) + `</div>`;
+
+  const uprava = `<form class="uprava netisknout" data-uprava hidden>
+  <div class="pole"><label for="nazev-${h(z.id)}">Co se dělá</label>
+    <input type="text" id="nazev-${h(z.id)}" data-pole="nazev" value="${h(z.nazev)}"></div>
+  <div class="pole"><label for="termin-${h(z.id)}">Termín montáže</label>
+    <input type="date" id="termin-${h(z.id)}" data-pole="termin" value="${h(z.terminMontaze)}"></div>
+  <div class="pole pole--siroke"><label for="pozn-${h(z.id)}">Poznámka</label>
+    <textarea id="pozn-${h(z.id)}" rows="2" data-pole="poznamka">${h(z.poznamka || "")}</textarea></div>
+  <div class="uprava__akce">
+    <button type="submit" class="tl tl--hlavni tl--maly">${ikona("uloz")} Uložit</button>
+    <button type="button" class="tl tl--maly" data-zrusit>Zrušit</button>
+  </div>
+</form>`;
+
+  const moznosti = Object.entries(STAVY_ZAKAZEK)
+    .map(([hodnota, [nazev]]) =>
+      `<option value="${h(hodnota)}"${hodnota === z.stav ? " selected" : ""}>${h(nazev)}</option>`)
+    .join("");
+
+  const akce = `<div class="akce-radku netisknout">
+  <label class="jen-pro-cteni" for="stav-${h(z.id)}">Stav zakázky</label>
+  <select id="stav-${h(z.id)}" data-stav-volba>${moznosti}</select>
+  <button type="button" class="tl tl--maly" data-dal>Posunout dál</button>
+  <span class="akce-radku__mezera"></span>
+  <button type="button" class="tl tl--maly" data-upravit>${ikona("tuzka")} Upravit</button>
+  <button type="button" class="tl tl--maly tl--nebezpecny" data-smazat>${ikona("koš")} Smazat</button>
+</div>
+<div class="potvrzeni netisknout" data-potvrzeni hidden>
+  ${ikona("pozor")}
+  <p>Opravdu zakázku smazat? V ostré verzi se přesune do archivu a jde vrátit zpátky.</p>
+  <button type="button" class="tl tl--maly tl--nebezpecny" data-smazat-ano>Ano, smazat</button>
+  <button type="button" class="tl tl--maly" data-smazat-ne>Nechat</button>
+</div>`;
+
+  const telo = akce + prehledHtml + uprava
+    + `<p class="ryska" style="margin-top:1.25rem">Kde to stojí</p>`
+    + postupHtml;
+
+  const proHledani = [z.id, z.nazev, z.nabidka, z.poznamka, k?.jmeno, k?.mesto]
+    .filter(Boolean).join(" ");
+
+  return rozbal({
+    hlavni,
+    vedle,
+    telo,
+    otevreno: jeVBehu(z),
+    atributy: {
+      "data-zakazka": z.id,
+      "data-stav": z.stav,
+      "data-text": proHledani,
+      "data-nazev": z.nazev,
+      "data-poznamka": z.poznamka || "",
+      "data-nabidka": z.nabidka || "",
+    },
+  });
 }
 
 /* ---------------------------------------------------------------- klienti */

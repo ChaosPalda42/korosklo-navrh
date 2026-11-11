@@ -42,8 +42,9 @@ to vaše ceny. Před ostrým provozem se naplní vaše.
 
 ## Co v ukázce nefunguje
 
-- **Nic se neukládá.** Změny textů, přesuny fotek a úpravy nabídky žijí jen
-  do obnovení stránky — ukázka je statická, bez serveru a bez databáze.
+- **Nic se neukládá.** Změny textů, přesuny fotek, úpravy nabídky i posun,
+  úprava a smazání zakázky žijí jen do obnovení stránky — ukázka je statická,
+  bez serveru a bez databáze.
 - **Poptávkový formulář na webu neposílá e-mail.** Ukáže jen hlášku, co by se stalo.
 - **Přihlášení do administrace nic nekontroluje.** Stačí kliknout na *Přihlásit se*.
 - **Tisk nabídky** používá tiskový dialog prohlížeče (odtud se dělá i PDF).

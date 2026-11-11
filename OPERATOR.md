@@ -50,3 +50,29 @@ Viz STATE.md (generuje harness). Poslední shrnutí operátora: —
 - `factory run` — spustí běh (kontrakty → workeři → brány → checkpointy)
 - `factory status` — stav, otevřené balíčky
 - `factory packets` — balíčky čekající na rozhodnutí; `factory answer <id> …`
+
+## 2026-11-11 — zakázky: stavy, úprava, mazání a filtr
+
+Po prokliknutí ukázky přišlo zadání: *„Jak můžu měnit stavy zakázky? Upravit jí
+případně smazat? … filtrovat podle stavu … za pár let tam bude překážet
+hromada hotových zakázek."*
+
+Rozhodnuto a uděláno:
+- Logika zakázek patří do knihovny, ne do stránky — kontrakt **C-005**
+  (`src/lib/zakazky.mjs`): postup prací, `dalsiStav`, `pocty`, `filtruj`
+  (bez diakritiky), `serad` (běžící dopředu podle nejbližší montáže, hotové
+  dozadu), `zmenStav`, `oznacKrok`. Zelený na 4 iterace, 32 testů v bráně.
+- Termín v budoucnosti vypisoval datum dvakrát, protože `pred()` z cestina.mjs
+  umí jen minulost. Místo záplaty kontrakt **C-006** (`src/lib/kdy.mjs`):
+  slovní odstup oběma směry. Zelený na 3 iterace.
+- Výchozí filtr je **V běhu**, aby hotové zakázky nepřekážely; volby nesou
+  počty a jdou kdykoli přepnout na *Hotové* / *Všechny*. Totéž počítá stránka
+  i prohlížeč ze stejné knihovny — `src/lib` se kopíruje do
+  `out/web/assets/lib/`, takže se filtr po kliknutí přepočítá stejně.
+- Mazání se ptá a hláska říká, že v ostré verzi jde zakázka do archivu.
+  V ukázce se nic neukládá; předávka `data/demo/CO-JE-VYMYSLENE.md` to teď
+  říká i o zakázkách a hlídá to `tests/test_predavka.py`.
+
+Práce běžela ve zkušební kopii ve scratchpadu, protože na projektu jel
+`factory run`; do repozitáře šla až po zeleném běhu, bez obou ručních
+náhražek knihoven.

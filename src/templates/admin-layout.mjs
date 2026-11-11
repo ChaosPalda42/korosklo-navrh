@@ -41,6 +41,7 @@ const TAHY = {
   fotka: '<rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="m3.5 17 5-4.5 4 3.5 3-2.5 5 4"/>',
   rust: '<path d="m4 16 5-5 3.5 3L20 7"/><path d="M15.5 7H20v4.5"/>',
   pokles: '<path d="m4 8 5 5 3.5-3L20 17"/><path d="M15.5 17H20v-4.5"/>',
+  tuzka: '<path d="M4 20h4l10-10a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="M13.5 6.5l4 4"/>',
   uloz: '<path d="M5.5 3.5h10L20 8v12.5H5.5z"/><path d="M8.5 3.5v5h7v-5"/><path d="M8.5 20.5v-6h7v6"/>',
   prazdne: '<path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z"/><path d="M4 8.5 12 13l8-4.5"/>',
 };
@@ -177,7 +178,7 @@ export function strankaAdmin(ctx, { titulek, nadpis, ryska, perex, cesta, akce, 
 <link rel="preload" href="${z}assets/fonts/Barlow-600-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${z}assets/admin.css">
 </head>
-<body>
+<body data-dnes="${h(ctx.dnes)}">
 <p class="panel-ukazka netisknout">
   <span><strong>Ukázka administrace.</strong> Změny se nikam neukládají — po obnovení stránky je ukázka zahodí.</span>
   <a href="${odkaz(stranka, "index.html")}">Zpět na web</a>
@@ -233,8 +234,10 @@ export function prazdno(nadpis, text) {
 }
 
 /** Rozkládací řádek (detail bez další stránky). */
-export function rozbal({ hlavni, vedle, telo, otevreno = false }) {
-  return `<details class="rozbal"${otevreno ? " open" : ""}>`
+export function rozbal({ hlavni, vedle, telo, otevreno = false, atributy = {} }) {
+  const navic = Object.entries(atributy)
+    .map(([jmeno, hodnota]) => ` ${jmeno}="${h(String(hodnota))}"`).join("");
+  return `<details class="rozbal"${otevreno ? " open" : ""}${navic}>`
     + `<summary>${ikona("sipka", "rozbal__sipka")}`
     + `<span class="rozbal__hlavni">${hlavni}</span>`
     + (vedle ? `<span class="rozbal__vedle">${vedle}</span>` : "")

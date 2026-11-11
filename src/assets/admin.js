@@ -4,7 +4,13 @@
  */
 
 import { polozkaCelkem, souhrn } from "./lib/nabidka.mjs";
-import { koruny } from "./lib/cestina.mjs";
+import { koruny, datum } from "./lib/cestina.mjs";
+import { kdy } from "./lib/kdy.mjs";
+import { postup, pocty, filtruj, dalsiStav, zmenStav, oznacKrok, STAVY }
+  from "./lib/zakazky.mjs";
+
+/** Den, ke kterému je ukázka postavená (sestavení ho dá do <body>). */
+const DNES = document.body.dataset.dnes || new Date().toISOString().slice(0, 10);
 
 /* ------------------------------------------------------------------ hlášky */
 
@@ -296,6 +302,251 @@ function nabidka() {
   prepocitej(dokument);
 }
 
+/* ---------------------------------------------------------------- zakázky */
+
+/** Názvy a barvy stavů — stejný slovník jako v šabloně (src/templates/crm.mjs). */
+const STAV_ZAKAZKY = {
+  priprava: ["Příprava", ""],
+  vyroba: ["Ve výrobě", "modra"],
+  montaz: ["Montáž", "zlata"],
+  hotovo: ["Hotovo", "zelena"],
+};
+
+/** Zakázky, jak je zrovna vidí stránka — čte se z atributů řádků. */
+function zakazkyZeStranky(obal) {
+  return [...obal.querySelectorAll("[data-zakazka]")].map((el) => ({
+    el,
+    id: el.dataset.zakazka,
+    stav: el.dataset.stav,
+    nazev: el.dataset.nazev || "",
+    poznamka: el.dataset.poznamka || "",
+    nabidka: el.dataset.nabidka || "",
+    hledatelne: el.dataset.text || "",
+  }));
+}
+
+function prekresliOdznak(radek) {
+  const [nazev, barva] = STAV_ZAKAZKY[radek.dataset.stav] ?? [radek.dataset.stav, ""];
+  const misto = radek.querySelector("[data-odznak]");
+  if (!misto) return;
+  misto.innerHTML = `<span class="odznak${barva ? ` odznak--${barva}` : ""}">${nazev}</span>`;
+}
+
+function prekresliKroky(radek) {
+  const polozky = [...radek.querySelectorAll("[data-postup] li")];
+  const zakazka = {
+    kroky: polozky.map((li) => [
+      li.querySelector("span")?.textContent ?? "",
+      "",
+      li.hasAttribute("data-hotovo"),
+    ]),
+  };
+  const stav = postup(zakazka);
+  const pocet = radek.querySelector("[data-kroky]");
+  if (pocet) pocet.textContent = `${stav.hotovych}/${stav.celkem} kroků`;
+
+  polozky.forEach((li, i) => {
+    const hotovo = zakazka.kroky[i][2];
+    const ted = !hotovo && stav.dalsi === zakazka.kroky[i];
+    li.toggleAttribute("data-hotovo", hotovo);
+    li.toggleAttribute("data-ted", ted);
+    const tl = li.querySelector("[data-krok]");
+    if (!tl) return;
+    tl.setAttribute("aria-pressed", String(hotovo));
+    tl.title = hotovo ? "Odškrtnout krok" : "Označit jako hotový";
+    tl.innerHTML = hotovo
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"`
+        + ` stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">`
+        + `<path d="m4.5 12.5 4.5 4.5 10-10.5"/></svg>`
+      : String(i + 1);
+  });
+}
+
+/** Filtr a počty u voleb. Hledá se přes src/lib/zakazky.mjs — stejný kód,
+ *  jakým se stránka sestavuje, takže diakritika nerozhoduje. */
+function prefiltrujZakazky(obal) {
+  const vsechny = zakazkyZeStranky(obal);
+  const stavy = (obal.dataset.stavy || "").split(",").filter(Boolean);
+  const hledane = obal.dataset.hledane || "";
+
+  const vybrane = new Set(
+    filtruj(vsechny.map((z) => ({ ...z, nazev: z.hledatelne })), { stavy, hledane })
+      .map((z) => z.id),
+  );
+  for (const z of vsechny) z.el.hidden = !vybrane.has(z.id);
+
+  const soucty = pocty(vsechny);
+  const karta = obal.closest(".karta");
+  for (const [klic, kolik] of [["vse", soucty.celkem], ["hotovo", soucty.hotove],
+    ["priprava,vyroba,montaz", soucty.vBehu]]) {
+    const misto = document.querySelector(`[data-pocet="${klic}"]`);
+    if (misto) misto.textContent = String(kolik);
+  }
+  const videt = karta?.querySelector("[data-videt]");
+  if (videt) {
+    videt.textContent = vybrane.size === soucty.celkem
+      ? `${soucty.celkem} celkem`
+      : `${vybrane.size} z ${soucty.celkem}`;
+  }
+  const prazdno = obal.parentElement?.querySelector("[data-prazdno]");
+  if (prazdno) prazdno.hidden = vybrane.size > 0;
+}
+
+function zakazkyFiltr(obal) {
+  for (const pole of document.querySelectorAll("[data-hledat-z]")) {
+    pole.addEventListener("input", () => {
+      obal.dataset.hledane = pole.value;
+      prefiltrujZakazky(obal);
+    });
+  }
+  for (const skupina of document.querySelectorAll("[data-filtr-z]")) {
+    skupina.addEventListener("click", (e) => {
+      const tl = e.target.closest("[data-hodnota]");
+      if (!tl) return;
+      for (const b of skupina.querySelectorAll("[data-hodnota]")) {
+        b.setAttribute("aria-pressed", String(b === tl));
+      }
+      obal.dataset.stavy = tl.dataset.hodnota;
+      prefiltrujZakazky(obal);
+    });
+  }
+}
+
+function zakazkyAkce(obal) {
+  obal.addEventListener("click", (e) => {
+    const radek = e.target.closest("[data-zakazka]");
+    if (!radek) return;
+
+    /* odškrtnutí kroku */
+    const krok = e.target.closest("[data-krok]");
+    if (krok) {
+      e.preventDefault();
+      const i = Number(krok.dataset.krok);
+      const bylo = krok.closest("li").hasAttribute("data-hotovo");
+      const polozky = [...radek.querySelectorAll("[data-postup] li")];
+      const zakazka = {
+        kroky: polozky.map((li) => ["", "", li.hasAttribute("data-hotovo")]),
+      };
+      const nova = oznacKrok(zakazka, i, !bylo);
+      polozky.forEach((li, j) => li.toggleAttribute("data-hotovo", nova.kroky[j][2]));
+      prekresliKroky(radek);
+      hlaska(bylo ? "Krok se zase otevřel." : "Krok je hotový. Zapíše se, kdo a kdy ho odškrtl.");
+      return;
+    }
+
+    /* posun o stav dál */
+    if (e.target.closest("[data-dal]")) {
+      const dalsi = dalsiStav(radek.dataset.stav);
+      if (!dalsi) {
+        hlaska("Zakázka je hotová — dál už to nejde.");
+        return;
+      }
+      nastavStav(radek, dalsi, obal);
+      return;
+    }
+
+    /* úprava */
+    if (e.target.closest("[data-upravit]")) {
+      radek.querySelector("[data-uprava]").hidden = false;
+      radek.querySelector("[data-zobrazeni]").hidden = true;
+      radek.querySelector("[data-uprava] [data-pole='nazev']")?.focus();
+      return;
+    }
+    if (e.target.closest("[data-zrusit]")) {
+      radek.querySelector("[data-uprava]").hidden = true;
+      radek.querySelector("[data-zobrazeni]").hidden = false;
+      return;
+    }
+
+    /* mazání */
+    if (e.target.closest("[data-smazat]")) {
+      radek.querySelector("[data-potvrzeni]").hidden = false;
+      return;
+    }
+    if (e.target.closest("[data-smazat-ne]")) {
+      radek.querySelector("[data-potvrzeni]").hidden = true;
+      return;
+    }
+    if (e.target.closest("[data-smazat-ano]")) {
+      radek.remove();
+      prefiltrujZakazky(obal);
+      hlaska("Zakázka by se přesunula do archivu — smazat ji nadobro umí jen majitel.");
+    }
+  });
+
+  /* změna stavu výběrem */
+  obal.addEventListener("change", (e) => {
+    const volba = e.target.closest("[data-stav-volba]");
+    if (!volba) return;
+    nastavStav(e.target.closest("[data-zakazka]"), volba.value, obal);
+  });
+
+  /* uložení úpravy */
+  obal.addEventListener("submit", (e) => {
+    const form = e.target.closest("[data-uprava]");
+    if (!form) return;
+    e.preventDefault();
+    const radek = e.target.closest("[data-zakazka]");
+    const hodnota = (jmeno) => form.querySelector(`[data-pole='${jmeno}']`)?.value.trim() ?? "";
+
+    const nazev = hodnota("nazev") || radek.dataset.nazev;
+    const termin = hodnota("termin");
+    const pozn = hodnota("poznamka");
+
+    radek.dataset.nazev = nazev;
+    radek.dataset.poznamka = pozn;
+    radek.dataset.text = [radek.dataset.zakazka, nazev, radek.dataset.nabidka, pozn].join(" ");
+    radek.querySelector("[data-zobraz='nazev']").textContent = nazev;
+    radek.querySelector("[data-zobraz='poznamka']").textContent = pozn || "—";
+    if (termin) {
+      radek.querySelector("[data-zobraz='terminDatum']").textContent = datum(termin);
+      radek.querySelector("[data-zobraz='terminPred']").textContent = kdy(termin, DNES);
+    }
+    form.hidden = true;
+    radek.querySelector("[data-zobrazeni]").hidden = false;
+    prefiltrujZakazky(obal);
+    hlaska("Takhle se změna uloží. V ukázce zůstane jen do obnovení stránky.");
+  });
+}
+
+function nastavStav(radek, stav, obal) {
+  if (!radek || !STAVY.includes(stav)) return;
+  const zakazka = {
+    stav: radek.dataset.stav,
+    kroky: [...radek.querySelectorAll("[data-postup] li")]
+      .map((li) => ["", "", li.hasAttribute("data-hotovo")]),
+  };
+  const nova = zmenStav(zakazka, stav);
+
+  radek.dataset.stav = nova.stav;
+  const volba = radek.querySelector("[data-stav-volba]");
+  if (volba) volba.value = nova.stav;
+  [...radek.querySelectorAll("[data-postup] li")]
+    .forEach((li, i) => li.toggleAttribute("data-hotovo", nova.kroky[i][2]));
+
+  prekresliOdznak(radek);
+  prekresliKroky(radek);
+  prefiltrujZakazky(obal);
+
+  hlaska(stav === "hotovo"
+    ? "Zakázka je hotová — zbylé kroky se odškrtly a zmizí z filtru „V běhu“."
+    : `Stav je teď „${STAV_ZAKAZKY[stav][0]}“. V ostré verzi se zapíše i to, kdo ho změnil.`);
+}
+
+function zakazky() {
+  const obal = document.querySelector("#seznam-zakazek");
+  if (!obal) return;
+  zakazkyFiltr(obal);
+  zakazkyAkce(obal);
+  prefiltrujZakazky(obal);
+
+  for (const tl of document.querySelectorAll("[data-nova-zakazka]")) {
+    tl.addEventListener("click", () => hlaska(
+      "Nová zakázka se obvykle založí z přijaté nabídky — převezme klienta, "
+      + "položky i cenu. V ukázce je to jen ukázka tlačítka."));
+  }
+}
+
 /* ------------------------------------------------------------------ start */
 
 panel();
@@ -303,3 +554,4 @@ filtry();
 ukladani();
 fotky();
 nabidka();
+zakazky();

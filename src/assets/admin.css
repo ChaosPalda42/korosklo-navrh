@@ -1129,6 +1129,79 @@ select {
 }
 
 /* ------------------------------------------------------------------- tisk */
+/* ------------------------------------------------------- zakázky: ovládání */
+.volba__pocet {
+  margin-left: 0.4375rem;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 999px;
+  background: var(--plocha-3);
+  color: var(--text-tlumený);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.volba[aria-pressed="true"] .volba__pocet {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--na-tmavém);
+}
+
+.karta__pocet { font-size: 0.8125rem; color: var(--text-slabý); font-variant-numeric: tabular-nums; }
+
+/* řádek s ovládáním nad podrobnostmi zakázky */
+.akce-radku {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.875rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--okraj-vnitřní);
+}
+
+.akce-radku select { width: auto; min-width: 8.5rem; }
+.akce-radku__mezera { flex: 1 1 auto; }
+
+/* úprava zakázky na místě */
+.uprava {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0 1rem;
+  padding: 1rem;
+  border: 1px solid var(--okraj-silný);
+  border-radius: var(--r);
+  background: var(--plocha-2);
+}
+
+.uprava .pole--siroke { grid-column: 1 / -1; }
+.uprava__akce { grid-column: 1 / -1; display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+
+/* potvrzení mazání — nikdy ne window.confirm */
+.potvrzeni {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 0.875rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(173, 43, 35, 0.35);
+  border-radius: var(--r);
+  background: var(--chyba-plocha);
+  color: var(--chyba);
+}
+
+.potvrzeni p { margin: 0; flex: 1 1 14rem; font-size: 0.875rem; }
+.potvrzeni svg { width: 1.125rem; height: 1.125rem; flex: none; }
+
+/* krok postupu je tlačítko — musí jít odškrtnout */
+button.postup__znak { cursor: pointer; font: inherit; font-size: 0.75rem; padding: 0; }
+button.postup__znak:hover { border-color: var(--zlata-sytá); }
+button.postup__znak:focus-visible { outline: 2px solid var(--zlata-sytá); outline-offset: 2px; }
+
+@media (max-width: 40rem) {
+  .akce-radku__mezera { display: none; }
+  .akce-radku select { flex: 1 1 100%; }
+}
+
 @media print {
   :root { --pozadí: #fff; }
 
@@ -1155,6 +1228,7 @@ select {
   .tabulka tbody tr { page-break-inside: avoid; }
 
   .tisk-jen { display: block !important; }
+  .akce-radku, .uprava, .potvrzeni, .filtry { display: none !important; }
 
   /* na stránce s dokumentem se tiskne jen dokument, ne nadpis obrazovky */
   body:has(.dokument) .hlava-stranky { display: none !important; }

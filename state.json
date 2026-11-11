@@ -44,6 +44,15 @@
       "last_finding": "",
       "packet": "",
       "updated_at": "2026-11-11T16:20:06+00:00"
+    },
+    "C-006": {
+      "status": "green",
+      "attempts": 1,
+      "iterations": 3,
+      "commit": "b6c1e8d",
+      "last_finding": "",
+      "packet": "",
+      "updated_at": "2026-11-11T16:31:10+00:00"
     }
   },
   "runs": [
@@ -66,6 +75,16 @@
       "red": 0,
       "escalated": 0,
       "note": "test_command passed (114 tests)"
+    },
+    {
+      "started_at": "2026-11-11T16:27:47+00:00",
+      "finished_at": "2026-11-11T16:31:19+00:00",
+      "outcome": "green",
+      "iterations": 3,
+      "green": 6,
+      "red": 0,
+      "escalated": 0,
+      "note": "test_command passed (150 tests)"
     }
   ],
   "open_packets": []
