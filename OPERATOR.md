@@ -32,6 +32,14 @@ Viz STATE.md (generuje harness). Poslední shrnutí operátora: —
   slib „nic se neukládá“ s kódem (žádné localStorage, fetch, cookie),
   den ukázky s `DNES` v `build.mjs` a vynechaný konfigurátor a chatbot
   s šablonami. Ověřeno i naopak: přepsané číslo v dokumentu bránu zčervená.
+- 2026-11-11: ukázka je veřejně na GitHub Pages
+  (https://chaospalda42.github.io/korosklo-navrh/), repozitář
+  ChaosPalda42/korosklo-navrh. Nasazuje ji workflow, které nejdřív sestaví
+  web a pustí testy a brány — červené sestavení se nenasadí. `robots.txt`
+  zakazuje indexování. Před prvním pushem proběhla kontrola na osobní data
+  nad 249 soubory (jen čísla a cesty na obrazovku): žádný cizí e-mail,
+  telefon jen zástupný z nápovědy, z přepisu schůzky se v repu neobjevuje
+  nic než „Google Analytics“.
 
 ## Pravidla projektu
 - Stack: python
