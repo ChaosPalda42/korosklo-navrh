@@ -1,0 +1,15 @@
+{
+  "id": "C-006",
+  "file": "src/lib/kdy.mjs",
+  "role": "coder",
+  "title": "Kdy to je — slovní odstup do minulosti i do budoucnosti",
+  "interface": "import { datum, dnuMezi, sMnoznym } from \"./cestina.mjs\";\n\nexport function kdy(iso, dnes) -> string\n  Krátká česká věta o tom, jak daleko je datum `iso` od dne `dnes`. Obě data jsou řetězce RRRR-MM-DD. Na rozdíl od `pred()` z cestina.mjs umí i budoucnost — pro termín montáže, který ještě nenastal.\n\n  Nejdřív ověř tvar obou dat regulárem /^\\d{4}-\\d{2}-\\d{2}$/. Když kterékoli z nich ten tvar nemá, vrať datum(iso) (pro nesmyslné `iso` je to prázdný řetězec). Teprve potom počítej d = dnuMezi(dnes, iso); kladné d znamená budoucnost.\n\n  Podle d (přesně v tomhle pořadí):\n    d === 0            -> \"dnes\"\n    d === 1            -> \"zítra\"\n    d === 2            -> \"pozítří\"\n    3 <= d <= 13       -> \"za \" + sMnoznym(d, [\"den\", \"dny\", \"dní\"])\n    14 <= d <= 59      -> \"za \" + sMnoznym(Math.round(d / 7), [\"týden\", \"týdny\", \"týdnů\"])\n    d === -1           -> \"včera\"\n    -13 <= d <= -2     -> \"před \" + sMnoznym(-d, [\"dnem\", \"dny\", \"dny\"])\n    -59 <= d <= -14    -> \"před \" + sMnoznym(Math.round(-d / 7), [\"týdnem\", \"týdny\", \"týdny\"])\n    jinak (|d| >= 60)  -> datum(iso)\n\n  Po \"za\" a po \"před\" je obyčejná mezera; pevnou mezeru mezi číslo a slovo dá sMnoznym sám. Nic jiného se nepřidává — žádná tečka, žádné velké písmeno.",
+  "uses": {
+    "src/lib/cestina.mjs": "datum(iso), dnuMezi(odIso, doIso), sMnoznym(n, tvary)"
+  },
+  "acceptance": "tests/test_kdy.py",
+  "notes": "ESM modul s jediným importem z ./cestina.mjs. Musí běžet v Node 24 i v prohlížeči: žádné `require`, žádné Node API (fs, path, process), žádné DOM API, žádné knihovny. Množné tvary nikdy neskládej ručně — vždycky přes sMnoznym, jinak budou mezery špatně. S daty nepočítej přes new Date(iso), od toho je dnuMezi.",
+  "budget": {
+    "iterations": 10
+  }
+}
