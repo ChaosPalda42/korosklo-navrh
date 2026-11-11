@@ -1,0 +1,695 @@
+/** Ukázka CRM — nabídky, zakázky, klienti, sklad, faktury.
+ *
+ *  POZOR: tohle je druhá fáze a samostatná zakázka. V ukázce je to proto,
+ *  aby bylo vidět, jak by to mohlo vypadat a že web na to je připravený.
+ *  Všechna data tady jsou vymyšlená.
+ */
+
+import { h, odkaz } from "../lib/cesty.mjs";
+import { cislo, koruny, sMnoznym, datum, datumKratce, pred, dnuMezi } from "../lib/cestina.mjs";
+import { polozkaCelkem, souhrn, stavPlatnosti } from "../lib/nabidka.mjs";
+import { stavKarty, podLimitem, hodnotaSkladu } from "../lib/sklad.mjs";
+import { stavFaktury, dnuPoSplatnosti, prehled, variabilniSymbol } from "../lib/faktura.mjs";
+import { ikona, karta, odznak, poznamka, popis, tabulka, rozbal, prazdno } from "./admin-layout.mjs";
+
+const FAZE = "Druhá fáze — <strong>samostatná zakázka</strong>. Takhle by mohlo vypadat "
+  + "to, co dnes děláte v Excelu a v šanonech. Data v ukázce jsou vymyšlená.";
+
+/* --------------------------------------------------------------- pomůcky */
+
+const STAVY_NABIDEK = {
+  navrh: ["Rozpracovaná", ""],
+  odeslana: ["Odeslaná", "modra"],
+  prijata: ["Přijatá", "zelena"],
+  zamitnuta: ["Zamítnutá", "cervena"],
+};
+
+const STAVY_ZAKAZEK = {
+  priprava: ["Příprava", ""],
+  vyroba: ["Ve výrobě", "modra"],
+  montaz: ["Montáž", "zlata"],
+  hotovo: ["Hotovo", "zelena"],
+};
+
+const STAVY_FAKTUR = {
+  navrh: ["Návrh", ""],
+  vystavena: ["Vystavená", "modra"],
+  "po-splatnosti": ["Po splatnosti", "cervena"],
+  zaplacena: ["Zaplacená", "zelena"],
+};
+
+function odznakZeSlovniku(slovnik, stav) {
+  const [nazev, barva] = slovnik[stav] ?? [stav, ""];
+  return odznak(nazev, barva);
+}
+
+/** Odznak platnosti nabídky i s počtem dní — hlavní bolest: cena drží 5 dní. */
+function odznakPlatnosti(n, dnes) {
+  const stav = stavPlatnosti(n, dnes);
+  const dnu = dnuMezi(dnes, n.platnostDo);
+  if (stav === "plati") return odznak(`Platí ${sMnoznym(dnu, ["den", "dny", "dní"])}`, "zelena");
+  if (stav === "konci") {
+    return odznak(dnu <= 0 ? "Platí jen dnes" : `Končí za ${sMnoznym(dnu, ["den", "dny", "dní"])}`, "zluta");
+  }
+  return odznak(`Prošlá ${sMnoznym(-dnu, ["den", "dny", "dní"])}`, "cervena");
+}
+
+function klient(ctx, id) {
+  return ctx.demo.klientiPodleId[id];
+}
+
+function adresaKlienta(k) {
+  if (!k) return "—";
+  const radky = [`<strong>${h(k.jmeno)}</strong>`];
+  if (k.ulice) radky.push(h(k.ulice));
+  if (k.mesto) radky.push(`${h(k.psc)} ${h(k.mesto)}`);
+  if (k.ico) radky.push(`IČ ${h(k.ico)}${k.dic ? ` · DIČ ${h(k.dic)}` : ""}`);
+  return radky.join("<br>");
+}
+
+/* --------------------------------------------------------- přehled (CRM) */
+
+function dlazdice(nazev, hodnota, popisek, { barva = "" } = {}) {
+  return `<article class="cislo">
+  <p class="cislo__nazev">${h(nazev)}</p>
+  <p class="cislo__hodnota">${hodnota}</p>
+  <p class="cislo__popis">${popisek}</p>
+</article>`;
+}
+
+export function crmPrehled(ctx) {
+  const { demo, stranka, dnes } = ctx;
+
+  const konci = demo.nabidky.filter((n) => n.stav === "odeslana" && stavPlatnosti(n, dnes) === "konci");
+  const prosle = demo.nabidky.filter((n) => n.stav === "odeslana" && stavPlatnosti(n, dnes) === "prosla");
+  const vBehu = demo.zakazky.filter((z) => z.stav !== "hotovo");
+  const p = prehled(demo.faktury, dnes);
+  const chybi = podLimitem(demo.sklad.karty);
+
+  const dlazdiceRada = `<div class="mriz mriz--4">`
+    + dlazdice("Nabídky, kterým končí cena", `${konci.length + prosle.length}`,
+      `z toho ${prosle.length} už prošlo`)
+    + dlazdice("Zakázky v běhu", `${vBehu.length}`,
+      `nejbližší montáž ${h(datumKratce(vBehu.map((z) => z.terminMontaze).sort()[0] ?? dnes))}`)
+    + dlazdice("Po splatnosti", koruny(p.poSplatnosti),
+      `${sMnoznym(p.pocty["po-splatnosti"], ["faktura", "faktury", "faktur"])}`)
+    + dlazdice("Hodnota skladu", koruny(hodnotaSkladu(demo.sklad.karty)),
+      `${sMnoznym(chybi.length, ["položka", "položky", "položek"])} pod limitem`)
+    + `</div>`;
+
+  /* „Co dnes řešit“ — to je celý smysl CRM: žádné hledání v šanonu. */
+  const ukoly = [];
+
+  for (const n of [...prosle, ...konci]) {
+    const k = klient(ctx, n.klient);
+    ukoly.push({
+      stav: stavPlatnosti(n, dnes),
+      text: `Nabídka <a href="${odkaz(stranka, `administrace/crm/nabidka-${n.cislo}.html`)}">${h(n.cislo)}</a>`
+        + ` pro ${h(k?.jmeno ?? "—")} — ${h(n.nazev.toLowerCase())}`,
+      vedle: odznakPlatnosti(n, dnes),
+    });
+  }
+
+  for (const f of demo.faktury) {
+    if (stavFaktury(f, dnes) !== "po-splatnosti") continue;
+    const k = klient(ctx, f.klient);
+    ukoly.push({
+      stav: "prosla",
+      text: `Faktura <strong>${h(f.cislo)}</strong> pro ${h(k?.jmeno ?? "—")} — ${koruny(f.celkem)}`,
+      vedle: odznak(`${sMnoznym(dnuPoSplatnosti(f, dnes), ["den", "dny", "dní"])} po splatnosti`, "cervena"),
+    });
+  }
+
+  for (const z of vBehu) {
+    const dnu = dnuMezi(dnes, z.terminMontaze);
+    if (dnu > 7) continue;
+    ukoly.push({
+      stav: "konci",
+      text: `Zakázka <strong>${h(z.id)}</strong> — ${h(z.nazev.toLowerCase())}`,
+      vedle: odznak(dnu <= 0 ? "montáž dnes" : `montáž za ${sMnoznym(dnu, ["den", "dny", "dní"])}`, "zlata"),
+    });
+  }
+
+  for (const k of chybi.slice(0, 3)) {
+    const s = stavKarty(k);
+    ukoly.push({
+      stav: "sklad",
+      text: `Doplnit <strong>${h(k.nazev)}</strong> — volné ${cislo(s.volne, 1)} ${h(k.jednotka)},`
+        + ` limit ${cislo(k.limit, 1)}`,
+      vedle: odznak("sklad", "zluta"),
+    });
+  }
+
+  const seznamUkolu = ukoly.length
+    ? `<ul class="pruhy" style="gap:0">`
+      + ukoly.map((u) => `<li style="grid-template-columns:minmax(0,1fr) auto;`
+        + `padding:0.6875rem 0;border-bottom:1px solid var(--okraj-vnitřní);align-items:center">`
+        + `<span style="white-space:normal;overflow:visible">${u.text}</span>${u.vedle}</li>`).join("")
+      + `</ul>`
+    : prazdno("Nic nehoří", "Žádná nabídka nekončí, nic není po splatnosti.");
+
+  const posledniPohyby = demo.sklad.pohyby.slice(0, 5);
+
+  const telo = dlazdiceRada
+    + `<div class="mriz mriz--sirsi-vlevo">`
+    + karta({
+      nadpis: "Co dnes řešit",
+      vedle: odznak(`${ukoly.length}`, "zlata", true),
+      telo: seznamUkolu,
+      pata: "Tohle je to, co dneska znamená hledání v šanonu: která nabídka komu končí "
+        + "a co se komu slíbilo.",
+    })
+    + karta({
+      nadpis: "Poslední pohyby na skladě",
+      vedle: `<a class="tl tl--maly" href="${odkaz(stranka, "administrace/crm/sklad.html")}">Sklad</a>`,
+      telo: tabulka({
+        sevrena: true,
+        sloupce: [{ nazev: "Co" }, { nazev: "Kolik", trida: "cisla" }],
+        radky: posledniPohyby.map((x) => {
+          const k = demo.sklad.karty.find((y) => y.kod === x.kod);
+          const znak = x.druh === "prijem" ? "+" : x.druh === "vydej" ? "−" : "";
+          return {
+            bunky: [
+              `<span class="tabulka__hlavni">${h(k?.nazev ?? x.kod)}</span>`
+              + `<span class="tabulka__pod">${h(x.popis)} · ${h(pred(x.kdy, dnes))}</span>`,
+              `${znak}${cislo(x.mnozstvi, 1)} ${h(k?.jednotka ?? "")}`
+              + `<span class="tabulka__pod">${h(x.druh === "rezervace" ? "rezervace" : x.druh)}</span>`,
+            ],
+          };
+        }),
+      }),
+      tesne: true,
+    })
+    + `</div>`
+    + poznamka("Z poptávky se udělá nabídka, z přijaté nabídky zakázka a z hotové zakázky "
+      + "faktura — a všechno zůstane u klienta v kartotéce. Nic se nepřepisuje ručně podruhé.");
+
+  return {
+    titulek: "CRM — přehled",
+    nadpis: "Přehled dne",
+    ryska: `Dnes je ${datum(dnes)}`,
+    perex: "Co má dneska někdo vzít do ruky. Nabídky, kterým končí cena, faktury po splatnosti, "
+      + "nejbližší montáže a co chybí na skladě.",
+    cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
+      { nazev: "CRM", kam: "administrace/crm/index.html" }, { nazev: "Přehled dne" }],
+    faze: FAZE,
+    telo,
+  };
+}
+
+/* --------------------------------------------------------------- nabídky */
+
+export function nabidky(ctx) {
+  const { demo, stranka, dnes } = ctx;
+
+  const radky = demo.nabidky.map((n) => {
+    const k = klient(ctx, n.klient);
+    const s = souhrn(n);
+    const cesta = odkaz(stranka, `administrace/crm/nabidka-${n.cislo}.html`);
+    return {
+      atributy: `data-stav="${h(n.stav)}" data-text="${h([n.cislo, k?.jmeno, n.nazev].join(" ").toLowerCase())}"`,
+      bunky: [
+        `<a class="tabulka__hlavni" href="${cesta}">${h(n.cislo)}</a>`
+        + `<span class="tabulka__pod">${h(datumKratce(n.vystaveno))}</span>`,
+        `<span class="tabulka__hlavni">${h(k?.jmeno ?? "—")}</span>`
+        + `<span class="tabulka__pod">${h(n.nazev)}</span>`,
+        odznakZeSlovniku(STAVY_NABIDEK, n.stav),
+        n.stav === "odeslana" ? odznakPlatnosti(n, dnes)
+          : `<span class="tabulka__pod">do ${h(datumKratce(n.platnostDo))}</span>`,
+        `<strong>${koruny(s.celkem)}</strong>`
+        + `<span class="tabulka__pod">${koruny(s.bezDph)} bez DPH</span>`,
+      ],
+    };
+  });
+
+  const telo = `<div class="filtry netisknout">
+  <label class="jen-pro-cteni" for="hledat-n">Hledat nabídku</label>
+  <input type="search" id="hledat-n" placeholder="Číslo, klient, co to je…" data-hledat="#seznam-nabidek">
+  <div class="volby" data-filtr="#seznam-nabidek">
+    <button class="volba" type="button" data-hodnota="" aria-pressed="true">Všechny</button>
+    <button class="volba" type="button" data-hodnota="odeslana" aria-pressed="false">Odeslané</button>
+    <button class="volba" type="button" data-hodnota="prijata" aria-pressed="false">Přijaté</button>
+    <button class="volba" type="button" data-hodnota="navrh" aria-pressed="false">Rozpracované</button>
+  </div>
+  <a class="tl tl--hlavni" href="${odkaz(stranka, `administrace/crm/nabidka-${demo.nabidky[0].cislo}.html`)}">`
+    + `${ikona("pridat")} Nová nabídka</a>
+</div>`
+    + karta({
+      nadpis: `Cenové nabídky (${demo.nabidky.length})`,
+      telo: `<div id="seznam-nabidek">`
+        + tabulka({
+          sloupce: [{ nazev: "Číslo", trida: "uzke" }, { nazev: "Klient a zakázka" },
+            { nazev: "Stav", trida: "uzke" }, { nazev: "Platnost ceny", trida: "uzke" },
+            { nazev: "Celkem", trida: "cisla" }],
+          radky,
+        })
+        + `</div>`
+        + `<div class="prazdno" data-prazdno hidden>${ikona("hledat")}<strong>Nic se nenašlo</strong></div>`,
+      tesne: true,
+      pata: "Nabídku si otevřete, přepíšete položku a cena se přepočítá sama. "
+        + "Tisk nebo PDF je jedno kliknutí — a nabídka zůstane dohledatelná i za rok.",
+    });
+
+  return {
+    titulek: "Cenové nabídky",
+    nadpis: "Cenové nabídky",
+    perex: "Místo Excelu, PowerPointu a šanonu. U každé nabídky je vidět, "
+      + "jak dlouho ještě drží cena.",
+    cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
+      { nazev: "CRM", kam: "administrace/crm/index.html" }, { nazev: "Cenové nabídky" }],
+    faze: FAZE,
+    telo,
+  };
+}
+
+/** Jedna nabídka — dokument s živým přepočtem a tiskem. */
+export function nabidkaDetail(ctx, n) {
+  const { site, stranka, dnes } = ctx;
+  const k = klient(ctx, n.klient);
+  const s = souhrn(n);
+  const stav = stavPlatnosti(n, dnes);
+  const dnu = dnuMezi(dnes, n.platnostDo);
+
+  const hlaskaPlatnosti = {
+    plati: `Cena platí do <strong>${h(datum(n.platnostDo))}</strong>`
+      + ` — ještě ${sMnoznym(dnu, ["den", "dny", "dní"])}.`,
+    konci: `Cena platí do <strong>${h(datum(n.platnostDo))}</strong>`
+      + (dnu <= 0 ? " — dnes je poslední den." : ` — zbývají ${sMnoznym(dnu, ["den", "dny", "dní"])}.`),
+    prosla: `Cena platila do <strong>${h(datum(n.platnostDo))}</strong>`
+      + ` — prošla ${sMnoznym(-dnu, ["den", "dny", "dní"])}. Před odpovědí zákazníkovi ji přepočítejte.`,
+  }[stav];
+
+  const radkyPolozek = n.polozky.map((p, i) => `<tr data-polozka>
+  <td><input type="text" value="${h(p.nazev)}" data-pole="nazev" aria-label="Položka ${i + 1} — co to je">`
+  + `<span class="tisk-jen" data-tisk-text>${h(p.nazev)}</span></td>
+  <td class="cisla"><input type="text" value="${h(cislo(p.mnozstvi, p.mnozstvi % 1 ? 2 : 0))}" data-pole="mnozstvi" style="width:5rem;text-align:right" aria-label="Množství"></td>
+  <td class="uzke"><input type="text" value="${h(p.jednotka)}" data-pole="jednotka" style="width:4rem" aria-label="Jednotka"></td>
+  <td class="cisla"><input type="text" value="${h(cislo(p.cena, p.cena % 1 ? 2 : 0))}" data-pole="cena" style="width:6rem;text-align:right" aria-label="Cena za jednotku"></td>
+  <td class="cisla"><input type="text" value="${p.sleva ? h(cislo(p.sleva, 0)) : ""}" data-pole="sleva" placeholder="0" style="width:3.5rem;text-align:right" aria-label="Sleva v procentech"></td>
+  <td class="cisla" data-dph="${p.dph ?? 21}">${p.dph ?? 21} %</td>
+  <td class="cisla"><strong data-celkem>${koruny(polozkaCelkem(p))}</strong></td>
+  <td class="uzke netisknout"><button class="tl tl--tichy tl--maly" type="button" data-smaz-polozku aria-label="Odebrat položku">${ikona("koš")}</button></td>
+</tr>`).join("");
+
+  const souhrnCeny = `<div class="souhrn-ceny" data-souhrn>
+  <div><span>Celkem bez DPH</span><span data-bez-dph>${koruny(s.bezDph)}</span></div>
+  ${s.dph.map((d) => `<div><span>DPH ${d.sazba} % ze ${koruny(d.zaklad)}</span>`
+    + `<span>${koruny(d.dan, true)}</span></div>`).join("")}
+  ${s.zaokrouhleni ? `<div><span>Zaokrouhlení</span><span>${koruny(s.zaokrouhleni, true)}</span></div>` : ""}
+  <div class="souhrn-ceny__celkem"><span>Celkem k zaplacení</span><span data-celkem-vse>${koruny(s.celkem)}</span></div>
+</div>`;
+
+  const dokument = `<div class="dokument" data-nabidka data-zaokrouhlit="${n.zaokrouhlit !== false}"
+  data-platce-dph="${n.platceDph !== false}">
+  <header class="dokument__hlava">
+    <div>
+      <p class="ryska">Cenová nabídka</p>
+      <h2>${h(n.cislo)} — ${h(n.nazev)}</h2>
+      <p style="color:var(--text-tlumený);margin-top:0.25rem">Vystaveno ${h(datum(n.vystaveno))}</p>
+    </div>
+    <div class="dokument__znacka">
+      <img src="${odkaz(stranka, "assets/img/logo.svg")}" width="1049" height="348" alt="${h(site.znacka)}">
+      ${h(site.firma)}<br>${h(site.ulice)}<br>${h(site.psc)} ${h(site.mesto)}<br>
+      IČ ${h(site.ico)} · DIČ ${h(site.dic)}
+    </div>
+  </header>
+
+  <div class="dokument__strany">
+    <div>
+      <h3>Pro</h3>
+      <p>${adresaKlienta(k)}</p>
+      ${k?.email ? `<p style="color:var(--text-tlumený)">${h(k.email)}${k.telefon ? ` · ${h(k.telefon)}` : ""}</p>` : ""}
+    </div>
+    <div>
+      <h3>Místo montáže</h3>
+      <p>${h(n.mistoMontaze)}</p>
+    </div>
+    <div>
+      <h3>Platnost ceny</h3>
+      <p><strong>${h(datum(n.platnostDo))}</strong></p>
+      <p style="color:var(--text-tlumený)">${sMnoznym(dnuMezi(n.vystaveno, n.platnostDo), ["den", "dny", "dní"])} od vystavení</p>
+    </div>
+  </div>
+
+  <div class="tabulka-obal">
+    <table class="tabulka" data-polozky>
+      <thead><tr>
+        <th>Položka</th><th class="cisla">Množství</th><th>Jedn.</th>
+        <th class="cisla">Cena / jedn.</th><th class="cisla">Sleva</th>
+        <th class="cisla">DPH</th><th class="cisla">Celkem</th><th class="netisknout"></th>
+      </tr></thead>
+      <tbody>${radkyPolozek}</tbody>
+    </table>
+  </div>
+
+  <p class="netisknout" style="margin-top:0.75rem">
+    <button class="tl tl--maly" type="button" data-pridat-polozku>${ikona("pridat")} Přidat položku</button>
+  </p>
+
+  <div style="margin-top:1.5rem">${souhrnCeny}</div>
+
+  ${n.poznamka ? `<div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--okraj)">
+    <h3 style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-slabý);font-family:var(--f-text)">Poznámka</h3>
+    <p style="margin-top:0.375rem">${h(n.poznamka)}</p>
+  </div>` : ""}
+
+  <p class="tisk-jen" style="margin-top:2rem;font-size:9pt;color:#555">
+    Nabídka je nezávazná a platí do uvedeného data. Ceny jsou včetně dopravy a montáže,
+    pokud je montáž uvedena jako položka.
+  </p>
+</div>`;
+
+  const akce = `<button class="tl tl--hlavni" type="button" data-tisk>${ikona("tisk")} Tisk nebo PDF</button>`
+    + (k?.email
+      ? `<a class="tl" href="mailto:${h(k.email)}?subject=${encodeURIComponent(`Cenová nabídka ${n.cislo} — KORO-SKLO`)}">`
+        + `${ikona("obalka")} Odeslat e-mailem</a>`
+      : "")
+    + `<a class="tl" href="${odkaz(stranka, "administrace/crm/zakazky.html")}">${ikona("zakazky")} Udělat zakázku</a>`
+    + `<a class="tl" href="${odkaz(stranka, "administrace/crm/faktury.html")}">${ikona("faktury")} Vytvořit fakturu</a>`;
+
+  const telo = `<div class="platnost platnost--${stav} netisknout">`
+    + ikona(stav === "prosla" ? "pozor" : "hodiny")
+    + `<span>${hlaskaPlatnosti}</span></div>`
+    + dokument
+    + poznamka("Čísla se přepočítávají hned, jak něco změníte — DPH, zaokrouhlení i celková cena. "
+      + "Tady jde o ukázku; v ostré verzi se nabídka uloží a zůstane dohledatelná pod svým číslem.",
+      { tisknout: false });
+
+  return {
+    titulek: `Nabídka ${n.cislo}`,
+    nadpis: `Nabídka ${n.cislo}`,
+    perex: h(n.nazev),
+    cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
+      { nazev: "CRM", kam: "administrace/crm/index.html" },
+      { nazev: "Cenové nabídky", kam: "administrace/crm/nabidky.html" },
+      { nazev: n.cislo }],
+    akce,
+    faze: FAZE,
+    telo,
+  };
+}
+
+/* --------------------------------------------------------------- zakázky */
+
+export function zakazky(ctx) {
+  const { demo, stranka, dnes } = ctx;
+
+  const radky = demo.zakazky.map((z) => {
+    const k = klient(ctx, z.klient);
+    const hotovych = z.kroky.filter(([, , hotovo]) => hotovo).length;
+    const dalsi = z.kroky.find(([, , hotovo]) => !hotovo);
+
+    const hlavni = `<strong>${h(z.id)} — ${h(z.nazev)}</strong>`
+      + `<span class="tabulka__pod">${h(k?.jmeno ?? "—")}</span>`;
+    const vedle = `${hotovych}/${z.kroky.length} kroků`
+      + odznakZeSlovniku(STAVY_ZAKAZEK, z.stav);
+
+    const postup = `<ol class="postup">`
+      + z.kroky.map(([nazev, kdy, hotovo], i) => {
+        const ted = !hotovo && dalsi && dalsi[0] === nazev;
+        return `<li${hotovo ? " data-hotovo" : ""}${ted ? " data-ted" : ""}>`
+          + `<span class="postup__znak">${hotovo ? ikona("fajfka") : i + 1}</span>`
+          + `<span>${h(nazev)}</span>`
+          + `<span class="postup__kdy">${h(datumKratce(kdy))}</span></li>`;
+      }).join("")
+      + `</ol>`;
+
+    const telo = popis([
+      ["Klient", k
+        ? `<a href="${odkaz(stranka, "administrace/crm/klienti.html")}#${h(k.id)}">${h(k.jmeno)}</a>`
+        : "—"],
+      ["Z nabídky", z.nabidka
+        ? `<a href="${odkaz(stranka, `administrace/crm/nabidka-${z.nabidka}.html`)}">${h(z.nabidka)}</a>`
+        : "—"],
+      ["Zahájeno", h(datum(z.zahajeno))],
+      ["Montáž", `${h(datum(z.terminMontaze))} <span class="tabulka__pod">${h(pred(z.terminMontaze, dnes))}</span>`],
+      ...(z.poznamka ? [["Poznámka", h(z.poznamka)]] : []),
+    ], { sloupce: true })
+      + `<p class="ryska" style="margin-top:1.25rem">Kde to stojí</p>`
+      + postup;
+
+    return rozbal({ hlavni, vedle, telo, otevreno: z.stav !== "hotovo" });
+  }).join("");
+
+  return {
+    titulek: "Zakázky",
+    nadpis: "Zakázky",
+    perex: "Z přijaté nabídky se stane zakázka. Je u ní vidět, co je hotové "
+      + "a co se má dělat dál — bez volání po dílně.",
+    cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
+      { nazev: "CRM", kam: "administrace/crm/index.html" }, { nazev: "Zakázky" }],
+    faze: FAZE,
+    telo: karta({ nadpis: `Zakázky (${demo.zakazky.length})`, telo: radky, tesne: true }),
+  };
+}
+
+/* ---------------------------------------------------------------- klienti */
+
+export function klienti(ctx) {
+  const { demo, stranka, dnes } = ctx;
+
+  const radky = demo.klienti.map((k) => {
+    const jehoPoptavky = demo.poptavky.filter((p) => p.klient === k.id);
+    const jehoNabidky = demo.nabidky.filter((n) => n.klient === k.id);
+    const jehoZakazky = demo.zakazky.filter((z) => z.klient === k.id);
+    const jehoFaktury = demo.faktury.filter((f) => f.klient === k.id);
+    const utratil = jehoFaktury.filter((f) => f.stav === "zaplacena")
+      .reduce((s, f) => s + f.celkem, 0);
+
+    const hlavni = `<strong>${h(k.jmeno)}</strong>`
+      + `<span class="tabulka__pod">${h(k.mesto)}`
+      + (k.typ === "firma" ? ` · IČ ${h(k.ico)}` : "") + `</span>`;
+    const vedle = odznak(k.typ === "firma" ? "Firma" : "Koncový zákazník",
+      k.typ === "firma" ? "modra" : "", true)
+      + `<span>${sMnoznym(jehoNabidky.length, ["nabídka", "nabídky", "nabídek"])}</span>`;
+
+    const historie = [
+      ...jehoPoptavky.map((p) => ({ kdy: p.prijato, co: `Poptávka — ${h(p.zprava.slice(0, 60))}…`, kam: null })),
+      ...jehoNabidky.map((n) => ({
+        kdy: n.vystaveno,
+        co: `Nabídka ${h(n.cislo)} — ${h(n.nazev)}`,
+        kam: `administrace/crm/nabidka-${n.cislo}.html`,
+      })),
+      ...jehoZakazky.map((z) => ({ kdy: z.zahajeno, co: `Zakázka ${h(z.id)} — ${h(z.nazev)}`, kam: "administrace/crm/zakazky.html" })),
+      ...jehoFaktury.map((f) => ({ kdy: f.vystaveno, co: `Faktura ${h(f.cislo)} — ${koruny(f.celkem)}`, kam: "administrace/crm/faktury.html" })),
+    ].sort((a, b) => (a.kdy < b.kdy ? 1 : -1));
+
+    const seznamHistorie = historie.length
+      ? `<ul class="postup">` + historie.map((x) => `<li>`
+        + `<span class="postup__znak" aria-hidden="true">·</span>`
+        + `<span>${x.kam ? `<a href="${odkaz(stranka, x.kam)}">${x.co}</a>` : x.co}</span>`
+        + `<span class="postup__kdy">${h(datumKratce(x.kdy))}</span></li>`).join("") + `</ul>`
+      : `<p style="color:var(--text-tlumený)">Zatím nic.</p>`;
+
+    const telo = popis([
+      ["Spojení", `<a href="tel:${h(k.telefon.replace(/\s/g, ""))}">${h(k.telefon)}</a>`
+        + (k.email ? `<br><a href="mailto:${h(k.email)}">${h(k.email)}</a>` : "")],
+      ["Adresa", `${h(k.ulice)}<br>${h(k.psc)} ${h(k.mesto)}`],
+      ...(k.ico ? [["IČ a DIČ", `${h(k.ico)}${k.dic ? ` · ${h(k.dic)}` : ""}`]] : []),
+      ["V kartotéce od", h(datum(k.zalozen))],
+      ["Zaplaceno celkem", `<strong>${koruny(utratil)}</strong>`],
+      ...(k.poznamka ? [["Naše poznámka", h(k.poznamka)]] : []),
+    ], { sloupce: true })
+      + `<p class="ryska" style="margin-top:1.25rem">Co s ním bylo</p>`
+      + seznamHistorie;
+
+    return `<div id="${h(k.id)}" data-text-filtr="${h([k.jmeno, k.mesto, k.email, k.ico ?? ""].join(" ").toLowerCase())}">`
+      + rozbal({ hlavni, vedle, telo })
+      + `</div>`;
+  }).join("");
+
+  return {
+    titulek: "Klienti",
+    nadpis: "Kartotéka klientů",
+    perex: "Zákazník zavolá po čtrnácti dnech a vy do něj napíšete jméno. Je u něj všechno — "
+      + "co poptával, co se mu nabídlo, za kolik a jak to skončilo.",
+    cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
+      { nazev: "CRM", kam: "administrace/crm/index.html" }, { nazev: "Klienti" }],
+    faze: FAZE,
+    telo: `<div class="filtry netisknout">`
+      + `<label class="jen-pro-cteni" for="hledat-k">Hledat klienta</label>`
+      + `<input type="search" id="hledat-k" placeholder="Jméno, město, IČ, e-mail…" data-hledat="#seznam-klientu">`
+      + `<a class="tl tl--hlavni" href="#">${ikona("pridat")} Nový klient</a>`
+      + `</div>`
+      + karta({
+        nadpis: `Klienti (${demo.klienti.length})`,
+        telo: `<div id="seznam-klientu">${radky}</div>`
+          + `<div class="prazdno" data-prazdno hidden>${ikona("hledat")}<strong>Nic se nenašlo</strong></div>`,
+        tesne: true,
+      }),
+  };
+}
+
+/* ------------------------------------------------------------------ sklad */
+
+export function sklad(ctx) {
+  const { demo, dnes } = ctx;
+  const karty = demo.sklad.karty;
+  const chybi = podLimitem(karty);
+  const chybiKody = new Set(chybi.map((k) => k.kod));
+
+  const radky = karty.map((k) => {
+    const s = stavKarty(k);
+    const pod = chybiKody.has(k.kod);
+    return {
+      atributy: `data-text="${h([k.kod, k.nazev, k.umisteni].join(" ").toLowerCase())}"`
+        + (pod ? ` data-stav="pod-limitem"` : ` data-stav="v-poradku"`),
+      bunky: [
+        `<span class="tabulka__hlavni">${h(k.nazev)}</span>`
+        + `<span class="tabulka__pod">${h(k.kod)} · ${h(k.umisteni)}</span>`,
+        `${cislo(s.naSklade, 1)} ${h(k.jednotka)}`,
+        s.rezervovano ? `${cislo(s.rezervovano, 1)} ${h(k.jednotka)}` : "—",
+        `<strong>${cislo(s.volne, 1)} ${h(k.jednotka)}</strong>`
+        + (pod ? `<span class="tabulka__pod">${odznak(`chybí ${cislo(k.limit - s.volne, 1)}`, "zluta")}</span>` : ""),
+        `${cislo(k.limit, 1)}`,
+        koruny(s.naSklade * k.cena),
+      ],
+    };
+  });
+
+  const sloupce = [{ nazev: "Materiál" }, { nazev: "Na skladě", trida: "cisla" },
+    { nazev: "Rezervováno", trida: "cisla" }, { nazev: "Volné", trida: "cisla" },
+    { nazev: "Limit", trida: "cisla" }, { nazev: "Hodnota", trida: "cisla" }];
+
+  const pata = `<tr><td colspan="5">Hodnota skladu celkem</td>`
+    + `<td class="cisla">${koruny(hodnotaSkladu(karty))}</td></tr>`;
+
+  const pohyby = tabulka({
+    sevrena: true,
+    sloupce: [{ nazev: "Kdy", trida: "uzke" }, { nazev: "Co" }, { nazev: "Kolik", trida: "cisla" },
+      { nazev: "Kdo", trida: "uzke" }],
+    radky: demo.sklad.pohyby.map((x) => {
+      const k = karty.find((y) => y.kod === x.kod);
+      const znak = x.druh === "prijem" ? "+" : x.druh === "vydej" ? "−" : "";
+      const barva = { prijem: "zelena", vydej: "modra", rezervace: "zluta" }[x.druh] ?? "";
+      return {
+        bunky: [
+          `${h(datumKratce(x.kdy))}<span class="tabulka__pod">${h(pred(x.kdy, dnes))}</span>`,
+          `<span class="tabulka__hlavni">${h(k?.nazev ?? x.kod)}</span>`
+          + `<span class="tabulka__pod">${h(x.popis)}</span>`,
+          `<strong>${znak}${cislo(x.mnozstvi, 1)} ${h(k?.jednotka ?? "")}</strong>`
+          + `<span class="tabulka__pod">${odznak(x.druh === "prijem" ? "příjem"
+            : x.druh === "vydej" ? "výdej" : "rezervace", barva)}</span>`,
+          h(x.kdo),
+        ],
+      };
+    }),
+  });
+
+  const telo = `<div class="mriz mriz--3">`
+    + dlazdice("Hodnota skladu", koruny(hodnotaSkladu(karty)), `${sMnoznym(karty.length, ["karta", "karty", "karet"])}`)
+    + dlazdice("Pod limitem", `${chybi.length}`, chybi.length
+      ? `nejvíc chybí ${h(chybi[0].nazev.toLowerCase())}`
+      : "všechno je nad limitem")
+    + dlazdice("Rezervováno na zakázky",
+      `${cislo(karty.reduce((s, k) => s + stavKarty(k).rezervovano * k.cena, 0))} Kč`,
+      "materiál, který už má svého zákazníka")
+    + `</div>`
+    + (chybi.length
+      ? poznamka(`Pod limitem je <strong>${sMnoznym(chybi.length, ["položka", "položky", "položek"])}</strong>. `
+        + `Nejdřív doplnit: ${chybi.slice(0, 3).map((k) => h(k.nazev)).join(", ")}.`, { jmenoIkony: "pozor" })
+      : "")
+    + karta({
+      nadpis: "Skladové karty",
+      vedle: `<div class="volby" data-filtr="#seznam-skladu">`
+        + `<button class="volba" type="button" data-hodnota="" aria-pressed="true">Všechny</button>`
+        + `<button class="volba" type="button" data-hodnota="pod-limitem" aria-pressed="false">Pod limitem</button>`
+        + `</div>`,
+      telo: `<div id="seznam-skladu">${tabulka({ sloupce, radky, pata })}</div>`,
+      tesne: true,
+      pata: "Papírová karta skončí. Příjem, výdej a rezervace na zakázku jsou tady "
+        + "a volné množství se počítá samo.",
+    })
+    + karta({
+      nadpis: "Pohyby na skladě",
+      telo: pohyby,
+      tesne: true,
+    });
+
+  return {
+    titulek: "Sklad",
+    nadpis: "Sklad",
+    perex: "Co je na skladě, co je rezervované na rozdělané zakázky a co je potřeba doplnit.",
+    cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
+      { nazev: "CRM", kam: "administrace/crm/index.html" }, { nazev: "Sklad" }],
+    faze: FAZE,
+    telo,
+  };
+}
+
+/* ---------------------------------------------------------------- faktury */
+
+export function faktury(ctx) {
+  const { demo, stranka, dnes } = ctx;
+  const p = prehled(demo.faktury, dnes);
+
+  const radky = demo.faktury.map((f) => {
+    const k = klient(ctx, f.klient);
+    const stav = stavFaktury(f, dnes);
+    const poSplatnosti = dnuPoSplatnosti(f, dnes);
+    return {
+      atributy: `data-stav="${h(stav)}" data-text="${h([f.cislo, k?.jmeno, f.popis].join(" ").toLowerCase())}"`,
+      bunky: [
+        `<span class="tabulka__hlavni">${h(f.cislo)}</span>`
+        + `<span class="tabulka__pod">VS ${h(variabilniSymbol(f.cislo))}</span>`,
+        `<span class="tabulka__hlavni">${h(k?.jmeno ?? "—")}</span>`
+        + `<span class="tabulka__pod">${h(f.popis)}</span>`,
+        f.zNabidky
+          ? `<a href="${odkaz(stranka, `administrace/crm/nabidka-${f.zNabidky}.html`)}">${h(f.zNabidky)}</a>`
+          : `<span style="color:var(--text-slabý)">—</span>`,
+        `${h(datumKratce(f.vystaveno))}`,
+        `${h(datumKratce(f.splatnost))}`
+        + (poSplatnosti ? `<span class="tabulka__pod" style="color:var(--chyba)">`
+          + `+${sMnoznym(poSplatnosti, ["den", "dny", "dní"])}</span>` : ""),
+        odznakZeSlovniku(STAVY_FAKTUR, stav),
+        `<strong>${koruny(f.celkem)}</strong>`,
+      ],
+    };
+  });
+
+  const telo = `<div class="mriz mriz--3">`
+    + dlazdice("Zaplaceno", koruny(p.zaplaceno), `${sMnoznym(p.pocty.zaplacena, ["faktura", "faktury", "faktur"])}`)
+    + dlazdice("Nezaplaceno", koruny(p.nezaplaceno),
+      `${sMnoznym(p.pocty.vystavena + p.pocty["po-splatnosti"], ["faktura", "faktury", "faktur"])} vystavených`)
+    + dlazdice("Po splatnosti", koruny(p.poSplatnosti),
+      `${sMnoznym(p.pocty["po-splatnosti"], ["faktura", "faktury", "faktur"])} — na tyhle zavolat`)
+    + `</div>`
+    + `<div class="filtry netisknout">`
+    + `<label class="jen-pro-cteni" for="hledat-f">Hledat fakturu</label>`
+    + `<input type="search" id="hledat-f" placeholder="Číslo, klient, co to bylo…" data-hledat="#seznam-faktur">`
+    + `<div class="volby" data-filtr="#seznam-faktur">`
+    + `<button class="volba" type="button" data-hodnota="" aria-pressed="true">Všechny</button>`
+    + `<button class="volba" type="button" data-hodnota="po-splatnosti" aria-pressed="false">Po splatnosti</button>`
+    + `<button class="volba" type="button" data-hodnota="vystavena" aria-pressed="false">Vystavené</button>`
+    + `<button class="volba" type="button" data-hodnota="zaplacena" aria-pressed="false">Zaplacené</button>`
+    + `</div></div>`
+    + karta({
+      nadpis: `Faktury (${demo.faktury.length})`,
+      telo: `<div id="seznam-faktur">`
+        + tabulka({
+          sloupce: [{ nazev: "Číslo", trida: "uzke" }, { nazev: "Klient a co to bylo" },
+            { nazev: "Z nabídky", trida: "uzke" }, { nazev: "Vystaveno", trida: "uzke" },
+            { nazev: "Splatnost", trida: "uzke" }, { nazev: "Stav", trida: "uzke" },
+            { nazev: "Celkem", trida: "cisla" }],
+          radky,
+        })
+        + `</div>`
+        + `<div class="prazdno" data-prazdno hidden>${ikona("hledat")}<strong>Nic se nenašlo</strong></div>`,
+      tesne: true,
+      pata: "Faktura se dělá z přijaté nabídky, takže se položky nepřepisují podruhé. "
+        + "Variabilní symbol se bere z čísla faktury.",
+    })
+    + poznamka("Předání do účetnictví se dá dodělat podle toho, co vaše účetní používá — "
+      + "buď exportem souboru, nebo přímým napojením.");
+
+  return {
+    titulek: "Faktury",
+    nadpis: "Faktury",
+    perex: "Z hotové zakázky vznikne faktura. Je vidět, kdo ještě nezaplatil "
+      + "a jak dlouho už je po splatnosti.",
+    cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
+      { nazev: "CRM", kam: "administrace/crm/index.html" }, { nazev: "Faktury" }],
+    faze: FAZE,
+    telo,
+  };
+}

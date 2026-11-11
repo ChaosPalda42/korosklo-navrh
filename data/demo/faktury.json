@@ -1,0 +1,84 @@
+[
+ {
+  "cislo": "2026-0115",
+  "zNabidky": "2026-0042",
+  "klient": "K-0042",
+  "vystaveno": "2026-11-10",
+  "splatnost": "2026-11-24",
+  "stav": "navrh",
+  "celkem": 68850,
+  "popis": "Zábradlí k dřevěnému schodišti — Sadová 12, Plzeň"
+ },
+ {
+  "cislo": "2026-0114",
+  "zNabidky": "2026-0036",
+  "klient": "K-0033",
+  "vystaveno": "2026-10-27",
+  "splatnost": "2026-11-10",
+  "stav": "vystavena",
+  "celkem": 25620,
+  "popis": "Posuvné dveře obývák–kuchyně"
+ },
+ {
+  "cislo": "2026-0113",
+  "zNabidky": "2026-0035",
+  "klient": "K-0034",
+  "vystaveno": "2026-10-07",
+  "splatnost": "2026-10-21",
+  "stav": "zaplacena",
+  "celkem": 10240,
+  "popis": "Lakobel a zrcadla — velkoobchod",
+  "zaplaceno": "2026-10-09"
+ },
+ {
+  "cislo": "2026-0112",
+  "zNabidky": null,
+  "klient": "K-0039",
+  "vystaveno": "2026-11-03",
+  "splatnost": "2026-12-03",
+  "stav": "vystavena",
+  "celkem": 61500,
+  "popis": "Bytový dům Pod Strání — etapa I, doplatek"
+ },
+ {
+  "cislo": "2026-0111",
+  "zNabidky": null,
+  "klient": "K-0036",
+  "vystaveno": "2026-10-18",
+  "splatnost": "2026-11-01",
+  "stav": "vystavena",
+  "celkem": 148300,
+  "popis": "Sprchové kouty hotel, etapa I"
+ },
+ {
+  "cislo": "2026-0110",
+  "zNabidky": null,
+  "klient": "K-0040",
+  "vystaveno": "2026-10-12",
+  "splatnost": "2026-11-11",
+  "stav": "vystavena",
+  "celkem": 37400,
+  "popis": "Dělicí stěny kancelář Americká — dodávka bez montáže"
+ },
+ {
+  "cislo": "2026-0109",
+  "zNabidky": null,
+  "klient": "K-0035",
+  "vystaveno": "2026-09-30",
+  "splatnost": "2026-10-14",
+  "stav": "zaplacena",
+  "celkem": 8900,
+  "popis": "Zasklení vitríny",
+  "zaplaceno": "2026-10-12"
+ },
+ {
+  "cislo": "2026-0108",
+  "zNabidky": null,
+  "klient": "K-0041",
+  "vystaveno": "2026-09-22",
+  "splatnost": "2026-10-06",
+  "stav": "zaplacena",
+  "celkem": 19700,
+  "popis": "Zrcadla do koupelny"
+ }
+]

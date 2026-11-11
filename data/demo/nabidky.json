@@ -1,0 +1,437 @@
+[
+ {
+  "cislo": "2026-0042",
+  "klient": "K-0042",
+  "poptavka": "P-2026-0087",
+  "nazev": "Celoskleněné zábradlí k dřevěnému schodišti",
+  "vystaveno": "2026-11-02",
+  "platnostDo": "2026-11-07",
+  "stav": "prijata",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "Sadová 12, Plzeň",
+  "poznamka": "Zaměřeno 2. 11. Kotvení do schodnic, bez madla. Montáž ve dvou dnech.",
+  "polozky": [
+   {
+    "nazev": "Kalené vrstvené sklo VSG 8.8.2 čiré, výroba na míru",
+    "mnozstvi": 10.4,
+    "jednotka": "m²",
+    "cena": 3180,
+    "dph": 21
+   },
+   {
+    "nazev": "Nerezové bodové terče AISI 304, broušené",
+    "mnozstvi": 14,
+    "jednotka": "ks",
+    "cena": 890,
+    "dph": 21
+   },
+   {
+    "nazev": "Výřezy a broušení hran",
+    "mnozstvi": 10.4,
+    "jednotka": "m²",
+    "cena": 420,
+    "dph": 21
+   },
+   {
+    "nazev": "Zaměření na místě",
+    "mnozstvi": 1,
+    "jednotka": "–",
+    "cena": 0,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž včetně kotvení do dřeva",
+    "mnozstvi": 14,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava Plzeň a okolí",
+    "mnozstvi": 2,
+    "jednotka": "cesta",
+    "cena": 450,
+    "dph": 21
+   }
+  ]
+ },
+ {
+  "cislo": "2026-0041",
+  "klient": "K-0038",
+  "poptavka": "P-2026-0086",
+  "nazev": "Zasklení pergoly posuvnými díly",
+  "vystaveno": "2026-10-26",
+  "platnostDo": "2026-10-31",
+  "stav": "prijata",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "Na Výsluní 203, Starý Plzenec",
+  "poznamka": "Čtyři posuvné díly, pojezd spodní. Sklo ESG 8 mm čiré.",
+  "polozky": [
+   {
+    "nazev": "Kalené sklo ESG 8 mm čiré",
+    "mnozstvi": 17.5,
+    "jednotka": "m²",
+    "cena": 2450,
+    "dph": 21
+   },
+   {
+    "nazev": "Posuvný systém, spodní pojezd, 4 díly",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 24800,
+    "dph": 21
+   },
+   {
+    "nazev": "Hliníkové profily, elox přírodní",
+    "mnozstvi": 21,
+    "jednotka": "bm",
+    "cena": 740,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž",
+    "mnozstvi": 16,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava",
+    "mnozstvi": 2,
+    "jednotka": "cesta",
+    "cena": 450,
+    "dph": 21
+   }
+  ]
+ },
+ {
+  "cislo": "2026-0040",
+  "klient": "K-0041",
+  "poptavka": "P-2026-0089",
+  "nazev": "Walk-in sprchová zástěna 110 cm",
+  "vystaveno": "2026-11-07",
+  "platnostDo": "2026-11-12",
+  "stav": "odeslana",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "K Lesu 8, Třemošná",
+  "poznamka": "Podlahový profil místo vrtání do velkoformátového obkladu. Stropní vzpěra černá matná.",
+  "polozky": [
+   {
+    "nazev": "Kalené sklo ESG 8 mm čiré, nano úprava",
+    "mnozstvi": 2.3,
+    "jednotka": "m²",
+    "cena": 2980,
+    "dph": 21
+   },
+   {
+    "nazev": "Podlahový profil, černá matná",
+    "mnozstvi": 1.1,
+    "jednotka": "bm",
+    "cena": 2400,
+    "dph": 21
+   },
+   {
+    "nazev": "Stropní vzpěra, černá matná",
+    "mnozstvi": 1,
+    "jednotka": "ks",
+    "cena": 3200,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž",
+    "mnozstvi": 4,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava",
+    "mnozstvi": 1,
+    "jednotka": "cesta",
+    "cena": 450,
+    "dph": 21
+   }
+  ]
+ },
+ {
+  "cislo": "2026-0039",
+  "klient": "K-0039",
+  "poptavka": "P-2026-0088",
+  "nazev": "Balkonové zábradlí do U profilu — 6 balkonů",
+  "vystaveno": "2026-11-05",
+  "platnostDo": "2026-11-10",
+  "stav": "odeslana",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "Pod Strání, Rokycany",
+  "poznamka": "Opakovaná dodávka, stejné provedení jako etapa I.",
+  "polozky": [
+   {
+    "nazev": "Kalené vrstvené sklo VSG 8.8.4 čiré",
+    "mnozstvi": 28.8,
+    "jednotka": "m²",
+    "cena": 3480,
+    "dph": 21,
+    "sleva": 8
+   },
+   {
+    "nazev": "Hliníkový U profil, elox stříbrný",
+    "mnozstvi": 24,
+    "jednotka": "bm",
+    "cena": 1850,
+    "dph": 21,
+    "sleva": 8
+   },
+   {
+    "nazev": "Kotvicí sada a výplňová pryž",
+    "mnozstvi": 6,
+    "jednotka": "kpl",
+    "cena": 1240,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž",
+    "mnozstvi": 28,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava Rokycany",
+    "mnozstvi": 3,
+    "jednotka": "cesta",
+    "cena": 780,
+    "dph": 21
+   }
+  ]
+ },
+ {
+  "cislo": "2026-0038",
+  "klient": "K-0036",
+  "poptavka": "P-2026-0090",
+  "nazev": "Sprchové kouty hotel, etapa II (pokoje 8–14)",
+  "vystaveno": "2026-11-09",
+  "platnostDo": "2026-11-14",
+  "stav": "odeslana",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "Zámecká 3, Nepomuk",
+  "poznamka": "Sedm koutů, černé kování. Montáž po dvou pokojích, aby šel provoz.",
+  "polozky": [
+   {
+    "nazev": "Kalené sklo ESG 8 mm čiré, nano úprava",
+    "mnozstvi": 16.1,
+    "jednotka": "m²",
+    "cena": 2980,
+    "dph": 21,
+    "sleva": 5
+   },
+   {
+    "nazev": "Kování černé matné, sada na kout",
+    "mnozstvi": 7,
+    "jednotka": "kpl",
+    "cena": 4900,
+    "dph": 21,
+    "sleva": 5
+   },
+   {
+    "nazev": "Montáž",
+    "mnozstvi": 28,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava Nepomuk",
+    "mnozstvi": 4,
+    "jednotka": "cesta",
+    "cena": 820,
+    "dph": 21
+   }
+  ]
+ },
+ {
+  "cislo": "2026-0037",
+  "klient": "K-0037",
+  "poptavka": "P-2026-0091",
+  "nazev": "Zrcadla do koupelny a předsíně",
+  "vystaveno": "2026-11-10",
+  "platnostDo": "2026-11-15",
+  "stav": "navrh",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "Brojova 16, Plzeň",
+  "poznamka": "Rozpracováno — čekáme na potvrzení rozměru v předsíni.",
+  "polozky": [
+   {
+    "nazev": "Zrcadlo 4 mm s fazetou 15 mm, 100 × 70 cm",
+    "mnozstvi": 0.7,
+    "jednotka": "m²",
+    "cena": 3600,
+    "dph": 21
+   },
+   {
+    "nazev": "Zrcadlo 4 mm broušená hrana, 60 × 160 cm",
+    "mnozstvi": 0.96,
+    "jednotka": "m²",
+    "cena": 2900,
+    "dph": 21
+   },
+   {
+    "nazev": "Lepicí sada na zrcadla",
+    "mnozstvi": 2,
+    "jednotka": "kpl",
+    "cena": 480,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž",
+    "mnozstvi": 3,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava",
+    "mnozstvi": 1,
+    "jednotka": "cesta",
+    "cena": 450,
+    "dph": 21
+   }
+  ]
+ },
+ {
+  "cislo": "2026-0036",
+  "klient": "K-0033",
+  "poptavka": "P-2026-0084",
+  "nazev": "Skleněné posuvné dveře mezi obývákem a kuchyní",
+  "vystaveno": "2026-10-13",
+  "platnostDo": "2026-10-18",
+  "stav": "prijata",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "Habrová 21, Plzeň",
+  "poznamka": "Hotovo a vyfakturováno.",
+  "polozky": [
+   {
+    "nazev": "Kalené sklo ESG 8 mm, satináto",
+    "mnozstvi": 2.1,
+    "jednotka": "m²",
+    "cena": 3240,
+    "dph": 21
+   },
+   {
+    "nazev": "Posuvný systém na stěnu, černý",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 8900,
+    "dph": 21
+   },
+   {
+    "nazev": "Mušle a zarážky",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 1450,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž",
+    "mnozstvi": 5,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava",
+    "mnozstvi": 1,
+    "jednotka": "cesta",
+    "cena": 450,
+    "dph": 21
+   }
+  ]
+ },
+ {
+  "cislo": "2026-0035",
+  "klient": "K-0034",
+  "poptavka": "P-2026-0083",
+  "nazev": "Lakobel na kuchyňskou linku a zrcadla do skříně",
+  "vystaveno": "2026-09-29",
+  "platnostDo": "2026-10-04",
+  "stav": "prijata",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "odběr na provozovně",
+  "poznamka": "Velkoobchodní ceny, montáž si dělá zákazník.",
+  "polozky": [
+   {
+    "nazev": "Lakobel RAL 9016, 6 mm, řez na míru",
+    "mnozstvi": 3.2,
+    "jednotka": "m²",
+    "cena": 1980,
+    "dph": 21,
+    "sleva": 12
+   },
+   {
+    "nazev": "Zrcadlo 4 mm, broušená hrana",
+    "mnozstvi": 1.8,
+    "jednotka": "m²",
+    "cena": 1420,
+    "dph": 21,
+    "sleva": 12
+   },
+   {
+    "nazev": "Vrtání otvorů pro zásuvky",
+    "mnozstvi": 4,
+    "jednotka": "ks",
+    "cena": 180,
+    "dph": 21
+   }
+  ]
+ },
+ {
+  "cislo": "2026-0034",
+  "klient": "K-0035",
+  "poptavka": null,
+  "nazev": "Zrcadlová stěna do posilovny",
+  "vystaveno": "2026-09-20",
+  "platnostDo": "2026-09-25",
+  "stav": "zamitnuta",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "mistoMontaze": "Lesní 44, Plzeň",
+  "poznamka": "Zákazník vybral levnější variantu u konkurence.",
+  "polozky": [
+   {
+    "nazev": "Zrcadlo 6 mm, broušená hrana",
+    "mnozstvi": 11.2,
+    "jednotka": "m²",
+    "cena": 1860,
+    "dph": 21
+   },
+   {
+    "nazev": "Lepicí sada",
+    "mnozstvi": 6,
+    "jednotka": "kpl",
+    "cena": 480,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž",
+    "mnozstvi": 8,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava",
+    "mnozstvi": 1,
+    "jednotka": "cesta",
+    "cena": 450,
+    "dph": 21
+   }
+  ]
+ }
+]

@@ -1,0 +1,29 @@
+{
+  "firma": "KORO-SKLO s.r.o.",
+  "znacka": "KORO-SKLO",
+  "podtitul": "Moderní sklenářství",
+  "heslo": "Sklo · Design · Preciznost",
+  "rokZalozeni": 1995,
+  "let": 30,
+  "domena": "korosklo.cz",
+  "web": "https://www.korosklo.cz",
+  "ic": "64357783",
+  "dic": "CZ64357783",
+  "adresa": { "ulice": "Na Roudné 1134/68", "psc": "301 00", "mesto": "Plzeň", "zeme": "Česká republika" },
+  "mapa": { "lat": 49.7593, "lon": 13.3772 },
+  "email": "info@korosklo.cz",
+  "telefony": [
+    { "role": "Kancelář a fakturace", "cisla": ["+420 377 530 484", "+420 725 894 741"] },
+    { "role": "Poptávky a technické poradenství", "cisla": ["+420 602 224 735"], "popis": "Cenové nabídky · technické konzultace · návrhy řešení" }
+  ],
+  "oteviraciDoba": [
+    { "den": "pondělí", "od": "7:00", "do": "15:30" },
+    { "den": "úterý", "od": "7:00", "do": "16:00" },
+    { "den": "středa", "od": "7:00", "do": "15:30" },
+    { "den": "čtvrtek", "od": "7:00", "do": "16:00" },
+    { "den": "pátek", "od": "7:00", "do": "15:30" },
+    { "den": "sobota", "od": null, "do": null },
+    { "den": "neděle", "od": null, "do": null }
+  ],
+  "pusobnost": ["Plzeň", "Plzeňský kraj", "Karlovarský kraj", "Praha a okolí"]
+}

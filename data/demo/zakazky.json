@@ -1,0 +1,140 @@
+[
+ {
+  "id": "Z-2026-0031",
+  "nabidka": "2026-0042",
+  "klient": "K-0042",
+  "nazev": "Zábradlí k dřevěnému schodišti",
+  "stav": "montaz",
+  "zahajeno": "2026-11-03",
+  "terminMontaze": "2026-11-13",
+  "kroky": [
+   [
+    "Zaměření",
+    "2026-11-02",
+    true
+   ],
+   [
+    "Objednávka skla",
+    "2026-11-03",
+    true
+   ],
+   [
+    "Výroba a broušení",
+    "2026-11-08",
+    true
+   ],
+   [
+    "Montáž",
+    "2026-11-13",
+    false
+   ],
+   [
+    "Předání a fakturace",
+    "2026-11-14",
+    false
+   ]
+  ],
+  "poznamka": "Sklo dorazilo z kalírny 6. 11., rozměry sedí."
+ },
+ {
+  "id": "Z-2026-0030",
+  "nabidka": "2026-0041",
+  "klient": "K-0038",
+  "nazev": "Zasklení pergoly",
+  "stav": "vyroba",
+  "zahajeno": "2026-10-28",
+  "terminMontaze": "2026-11-19",
+  "kroky": [
+   [
+    "Zaměření",
+    "2026-10-27",
+    true
+   ],
+   [
+    "Objednávka profilů",
+    "2026-10-29",
+    true
+   ],
+   [
+    "Výroba",
+    "2026-11-12",
+    false
+   ],
+   [
+    "Montáž",
+    "2026-11-19",
+    false
+   ],
+   [
+    "Předání a fakturace",
+    "2026-11-20",
+    false
+   ]
+  ],
+  "poznamka": "Profily přislíbeny na 12. 11."
+ },
+ {
+  "id": "Z-2026-0029",
+  "nabidka": "2026-0036",
+  "klient": "K-0033",
+  "nazev": "Posuvné dveře obývák–kuchyně",
+  "stav": "hotovo",
+  "zahajeno": "2026-10-15",
+  "terminMontaze": "2026-10-26",
+  "kroky": [
+   [
+    "Zaměření",
+    "2026-10-14",
+    true
+   ],
+   [
+    "Objednávka",
+    "2026-10-16",
+    true
+   ],
+   [
+    "Výroba",
+    "2026-10-22",
+    true
+   ],
+   [
+    "Montáž",
+    "2026-10-26",
+    true
+   ],
+   [
+    "Předání a fakturace",
+    "2026-10-27",
+    true
+   ]
+  ],
+  "poznamka": "Předáno bez výhrad."
+ },
+ {
+  "id": "Z-2026-0028",
+  "nabidka": "2026-0035",
+  "klient": "K-0034",
+  "nazev": "Lakobel a zrcadla — velkoobchod",
+  "stav": "hotovo",
+  "zahajeno": "2026-10-01",
+  "terminMontaze": "2026-10-07",
+  "kroky": [
+   [
+    "Řez a úprava",
+    "2026-10-04",
+    true
+   ],
+   [
+    "Odběr na provozovně",
+    "2026-10-07",
+    true
+   ],
+   [
+    "Fakturace",
+    "2026-10-07",
+    true
+   ]
+  ],
+  "poznamka": "Odebráno osobně, platba hotově."
+ }
+]

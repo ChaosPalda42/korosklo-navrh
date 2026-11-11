@@ -1,0 +1,507 @@
+/* ===========================================================================
+   KORO-SKLO — design systém
+   Tmavý web: logo je kreslené na tmavé pozadí, tak na něm web i stojí.
+   Akcenty: zlatá z loga (--zlata) a zelenkavá hrana float skla (--hrana-skla).
+   Administrace přepíná tytéž tokeny do světlého režimu (admin.css).
+   =========================================================================== */
+
+/* ----------------------------------------------------------------- písma */
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/Barlow-500-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/Barlow-500-latin.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Barlow-600-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Barlow-600-latin.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/Barlow-700-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/Barlow-700-latin.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Inter-400-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Inter-400-latin.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/Inter-500-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/Inter-500-latin.woff2") format("woff2"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Inter-600-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Inter-600-latin.woff2") format("woff2"); }
+
+/* ---------------------------------------------------------------- tokeny */
+:root {
+  /* značka — z loga, nemění se s režimem */
+  --zlata: #d9b875;
+  --zlata-sytá: #c6a35a;
+  --stříbro: #b3b3b3;
+  --hrana-skla: #8fc0b8;          /* zelenkavá hrana řezaného float skla */
+
+  /* tmavý režim (veřejný web) */
+  --noc: #090d10;
+  --pozadí: #090d10;
+  --plocha: #11171b;
+  --plocha-2: #182026;
+  --plocha-3: #212b32;
+  --text: #eef2f4;
+  --text-tlumený: #a7b3b9;
+  --text-slabý: #7a868d;
+  --okraj: rgba(255, 255, 255, 0.11);
+  --okraj-silný: rgba(255, 255, 255, 0.2);
+  --sklo: rgba(255, 255, 255, 0.055);
+  --sklo-silné: rgba(16, 22, 26, 0.72);
+  --akcent: var(--zlata);
+  --akcent-text: var(--zlata);     /* zlatá jako text smí jen na tmavém */
+  --na-akcentu: #16120a;           /* text na zlaté ploše */
+
+  /* stavy */
+  --v-poradku: #5fc08a;
+  --pozor: #e8b45c;
+  --chyba: #ef7b7b;
+
+  /* písma a rozměry */
+  --f-nadpis: "Barlow", system-ui, sans-serif;
+  --f-text: "Inter", system-ui, sans-serif;
+  --šířka: 1240px;
+  --šířka-text: 68ch;
+  --okraj-stránky: clamp(1rem, 4vw, 3rem);
+  --r: 3px;                        /* sklo se nezaobluje */
+  --r-velký: 4px;
+  --stín: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --přechod: 220ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* ------------------------------------------------------------------ reset */
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--pozadí);
+  color: var(--text);
+  font-family: var(--f-text);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img, svg, video { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+h1, h2, h3, h4 { font-family: var(--f-nadpis); font-weight: 600; line-height: 1.1; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2.25rem, 1.3rem + 4.2vw, 4.25rem); font-weight: 700; }
+h2 { font-size: clamp(1.75rem, 1.1rem + 2.6vw, 2.75rem); }
+h3 { font-size: clamp(1.2rem, 1rem + 0.8vw, 1.5rem); }
+p { margin: 0 0 1em; }
+p:last-child { margin-bottom: 0; }
+
+::selection { background: var(--zlata); color: var(--na-akcentu); }
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--hrana-skla);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.jen-pro-cteni {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.preskocit {
+  position: absolute; left: 0; top: -4rem; z-index: 200;
+  background: var(--zlata); color: var(--na-akcentu);
+  padding: 0.7rem 1.2rem; font-weight: 600; text-decoration: none;
+  transition: top var(--přechod);
+}
+.preskocit:focus { top: 0; }
+
+/* ------------------------------------------------------------- stavebnice */
+.obal { width: min(100% - 2 * var(--okraj-stránky), var(--šířka)); margin-inline: auto; }
+.obal--uzky { width: min(100% - 2 * var(--okraj-stránky), 820px); margin-inline: auto; }
+
+.sekce { padding-block: clamp(3.5rem, 2rem + 6vw, 7rem); }
+.sekce--tesna { padding-block: clamp(2.5rem, 1.5rem + 4vw, 4.5rem); }
+.sekce--plocha { background: var(--plocha); }
+
+/* popisek sekce — malá kapitálka se zlatou ryskou, jako kóta ve výkresu */
+.ryska {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-family: var(--f-nadpis); font-size: 0.8125rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--zlata); margin: 0 0 1rem;
+}
+.ryska::before {
+  content: ""; width: 2.25rem; height: 1px; background: var(--zlata); flex: none;
+}
+
+.hlavicka-sekce { max-width: 56ch; margin-bottom: clamp(2rem, 1rem + 3vw, 3.25rem); }
+.hlavicka-sekce p { color: var(--text-tlumený); font-size: 1.125rem; margin-top: 0.9rem; }
+
+.mrizka { display: grid; gap: clamp(1rem, 0.5rem + 1.6vw, 1.75rem); }
+.mrizka--2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.mrizka--3 { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); }
+.mrizka--4 { grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); }
+
+/* ---------------------------------------------------------------- tlačítka */
+.tl {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  padding: 0.85rem 1.6rem; border: 1px solid transparent; border-radius: var(--r);
+  font-family: var(--f-nadpis); font-weight: 600; font-size: 1rem; letter-spacing: 0.01em;
+  text-decoration: none; cursor: pointer; background: none;
+  transition: background var(--přechod), border-color var(--přechod), color var(--přechod), transform var(--přechod);
+}
+.tl:hover { transform: translateY(-1px); }
+.tl:active { transform: translateY(0); }
+.tl--hlavni { background: var(--zlata); color: var(--na-akcentu); }
+.tl--hlavni:hover { background: #e7cb92; }
+.tl--obrys { border-color: var(--okraj-silný); color: var(--text); }
+.tl--obrys:hover { border-color: var(--hrana-skla); color: var(--hrana-skla); background: rgba(143, 192, 184, 0.07); }
+.tl--tichy { padding-inline: 0; color: var(--zlata); }
+.tl--tichy::after { content: "→"; transition: transform var(--přechod); }
+.tl--tichy:hover::after { transform: translateX(4px); }
+.tl--maly { padding: 0.55rem 1.1rem; font-size: 0.9rem; }
+
+/* ------------------------------------------------------------------ sklo */
+/* Průsvitná tabule: tmavé jádro, světlá hrana nahoře a vlevo.
+   Používá se na panely v heru, karty a dialogy. */
+.tabule {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.025) 42%, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--okraj);
+  border-radius: var(--r);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+}
+.tabule::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), transparent 28%) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px; opacity: 0.35;
+}
+
+/* hrana řezaného skla — 2px zelenkavý pruh u spodní nebo levé hrany */
+.hrana-vlevo { position: relative; }
+.hrana-vlevo::after {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--hrana-skla) 18%, var(--hrana-skla) 82%, transparent);
+  opacity: 0.55;
+}
+
+/* --------------------------------------------------------------- hlavička */
+.hlava {
+  position: sticky; top: 0; z-index: 100;
+  transition: background var(--přechod), border-color var(--přechod), backdrop-filter var(--přechod);
+  border-bottom: 1px solid transparent;
+}
+.hlava__vnitrek { display: flex; align-items: center; gap: 1.5rem; min-height: 4.75rem; }
+.hlava[data-posunuta="ano"] {
+  background: var(--sklo-silné);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-bottom-color: var(--okraj);
+}
+
+.znacka { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; flex: none; }
+.znacka img.znacka__sklo { width: auto; height: 2.3rem; }
+.znacka img.znacka__slovo { width: auto; height: 1.15rem; }
+.znacka:hover img { filter: brightness(1.12); }
+
+.menu { margin-left: auto; display: flex; align-items: center; gap: 0.25rem; }
+.menu a {
+  position: relative; padding: 0.55rem 0.85rem; text-decoration: none;
+  font-family: var(--f-nadpis); font-weight: 500; font-size: 1rem; color: var(--text-tlumený);
+  transition: color var(--přechod);
+}
+.menu a:hover { color: var(--text); }
+.menu a[aria-current] { color: var(--text); }
+.menu a[aria-current]::after {
+  content: ""; position: absolute; left: 0.85rem; right: 0.85rem; bottom: 0.2rem;
+  height: 1px; background: var(--zlata);
+}
+.hlava .tl { flex: none; }
+
+.prepinac-menu { display: none; }
+
+@media (max-width: 62rem) {
+  .prepinac-menu {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    margin-left: auto; padding: 0.55rem 0.9rem; border: 1px solid var(--okraj-silný);
+    border-radius: var(--r); background: none; cursor: pointer;
+    font-family: var(--f-nadpis); font-weight: 600; font-size: 0.9rem;
+  }
+  .hlava__vnitrek > .tl--hlavni { display: none; }
+  .menu {
+    position: absolute; top: 100%; left: 0; right: 0; margin: 0;
+    flex-direction: column; align-items: stretch;
+    gap: 0; padding: 0.5rem var(--okraj-stránky) 1.5rem;
+    background: var(--sklo-silné); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--okraj);
+    max-height: 72dvh; overflow-y: auto;
+  }
+  .menu[hidden] { display: none !important; }
+  .menu a { padding: 0.9rem 0; font-size: 1.1rem; border-bottom: 1px solid var(--okraj); }
+  .menu a[aria-current]::after { left: 0; right: auto; width: 1.5rem; bottom: 0.55rem; }
+  .menu .tl { margin-top: 1rem; }
+}
+
+/* ------------------------------------------------------------------- hero */
+.hero { position: relative; min-height: min(86vh, 48rem); display: grid; align-items: end; overflow: hidden; }
+.hero--kratky { min-height: min(52vh, 30rem); }
+.hero__foto { position: absolute; inset: 0; }
+.hero__foto img { width: 100%; height: 100%; object-fit: cover; }
+.hero__foto::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(to top, var(--noc) 2%, rgba(9, 13, 16, 0.72) 38%, rgba(9, 13, 16, 0.35) 70%, rgba(9, 13, 16, 0.6)),
+    linear-gradient(to right, rgba(9, 13, 16, 0.78), transparent 65%);
+}
+.hero__obsah { position: relative; padding-block: clamp(3rem, 2rem + 6vw, 6rem); }
+.hero__panel { max-width: 46rem; padding: clamp(1.5rem, 1rem + 2.5vw, 2.75rem); }
+.hero__panel h1 { margin-bottom: 1rem; text-wrap: balance; }
+.hero__panel p { color: var(--text-tlumený); font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem); max-width: 46ch; }
+.hero__akce { display: flex; flex-wrap: wrap; gap: 0.85rem; margin-top: 1.75rem; }
+
+/* pás faktů pod herem */
+.fakta { display: flex; flex-wrap: wrap; gap: 0 clamp(1.5rem, 1rem + 2vw, 3rem); border-top: 1px solid var(--okraj); }
+.fakta > * { padding-block: 1.25rem; display: flex; align-items: baseline; gap: 0.6rem; }
+.fakta dt { font-family: var(--f-nadpis); font-size: 1.5rem; font-weight: 700; color: var(--zlata); margin: 0; }
+.fakta dd { margin: 0; color: var(--text-tlumený); font-size: 0.95rem; }
+
+/* ------------------------------------------------------------------ karty */
+.karta {
+  display: flex; flex-direction: column; text-decoration: none; overflow: hidden;
+  background: var(--plocha); border: 1px solid var(--okraj); border-radius: var(--r);
+  transition: border-color var(--přechod), transform var(--přechod), background var(--přechod);
+}
+.karta:hover { border-color: var(--okraj-silný); transform: translateY(-3px); background: var(--plocha-2); }
+.karta__foto { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: var(--plocha-2); }
+.karta__foto img { width: 100%; height: 100%; object-fit: cover; transition: transform 500ms cubic-bezier(0.2, 0.7, 0.3, 1); }
+.karta:hover .karta__foto img { transform: scale(1.04); }
+.karta__telo { padding: 1.15rem 1.25rem 1.35rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+.karta__telo h3 { text-wrap: balance; }
+.karta__telo p { color: var(--text-tlumený); font-size: 0.95rem; margin: 0; }
+.karta__pata { margin-top: auto; padding-top: 0.75rem; color: var(--zlata); font-family: var(--f-nadpis); font-weight: 600; font-size: 0.95rem; }
+.karta__stitek {
+  position: absolute; left: 0.75rem; top: 0.75rem; z-index: 1;
+  background: var(--sklo-silné); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--okraj); border-radius: 2px;
+  padding: 0.3rem 0.65rem; font-family: var(--f-nadpis); font-size: 0.75rem;
+  font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text);
+}
+
+/* rozcestník — tři vstupy pro tři typy zákazníků */
+.vstup {
+  display: flex; flex-direction: column; gap: 0.75rem; text-decoration: none;
+  padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+  background: var(--plocha); border: 1px solid var(--okraj); border-radius: var(--r);
+  transition: border-color var(--přechod), background var(--přechod);
+}
+.vstup:hover { border-color: var(--zlata); background: var(--plocha-2); }
+.vstup__cislo { font-family: var(--f-nadpis); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.2em; color: var(--zlata); }
+.vstup p { color: var(--text-tlumený); font-size: 0.975rem; margin: 0; flex: 1; }
+.vstup__sipka { color: var(--zlata); font-family: var(--f-nadpis); font-weight: 600; }
+
+/* --------------------------------------------------------------- postup */
+.postup { counter-reset: krok; display: grid; gap: 1px; background: var(--okraj); border: 1px solid var(--okraj); border-radius: var(--r); overflow: hidden; }
+@media (min-width: 52rem) { .postup { grid-template-columns: repeat(4, 1fr); } }
+.postup__krok { counter-increment: krok; background: var(--plocha); padding: clamp(1.25rem, 1rem + 1.5vw, 2rem); }
+.postup__krok::before {
+  content: "0" counter(krok); display: block; margin-bottom: 0.75rem;
+  font-family: var(--f-nadpis); font-size: 2rem; font-weight: 700; line-height: 1;
+  color: transparent; -webkit-text-stroke: 1px var(--zlata);
+}
+.postup__krok h3 { font-size: 1.125rem; margin-bottom: 0.4rem; }
+.postup__krok p { color: var(--text-tlumený); font-size: 0.925rem; margin: 0; }
+
+/* ------------------------------------------------------- text a seznamy */
+.proza { max-width: var(--šířka-text); }
+.proza p { color: var(--text-tlumený); }
+.proza p:first-of-type { color: var(--text); font-size: 1.1875rem; }
+
+.odrazky { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.7rem; }
+.odrazky li { position: relative; padding-left: 1.6rem; color: var(--text-tlumený); }
+.odrazky li::before {
+  content: ""; position: absolute; left: 0; top: 0.65em; width: 0.55rem; height: 1px; background: var(--zlata);
+}
+
+.tabulka-parametru { width: 100%; border-collapse: collapse; }
+.tabulka-parametru th, .tabulka-parametru td { text-align: left; padding: 0.7rem 0; border-bottom: 1px solid var(--okraj); vertical-align: top; }
+.tabulka-parametru th { font-family: var(--f-nadpis); font-weight: 600; color: var(--text-slabý); width: 40%; font-size: 0.9375rem; }
+.tabulka-parametru td { color: var(--text); }
+
+/* ---------------------------------------------------------------- galerie */
+.galerie { display: grid; gap: clamp(0.5rem, 0.3rem + 0.8vw, 0.9rem); grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); }
+.galerie button {
+  padding: 0; border: 1px solid var(--okraj); border-radius: var(--r); overflow: hidden; cursor: zoom-in;
+  background: var(--plocha-2); aspect-ratio: 3 / 2;
+  transition: border-color var(--přechod);
+}
+.galerie button:hover { border-color: var(--hrana-skla); }
+.galerie img { width: 100%; height: 100%; object-fit: cover; }
+
+/* lightbox */
+.lupa:not([open]) { display: none; }
+.lupa[open] {
+  position: fixed; inset: 0; z-index: 200;
+  width: 100%; height: 100%; max-width: 100%; max-height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem; margin: 0; border: 0; background: rgba(5, 8, 10, 0.94);
+}
+.lupa > div { display: flex; flex-direction: column; align-items: center; max-width: 100%; }
+.lupa::backdrop { background: rgba(5, 8, 10, 0.94); }
+.lupa img { width: auto; height: auto; max-width: min(100%, 86rem); max-height: 82dvh; object-fit: contain; border-radius: var(--r); }
+.lupa__popis { margin-top: 0.9rem; color: var(--text-tlumený); font-size: 0.95rem; text-align: center; }
+.lupa__zavrit, .lupa__dal, .lupa__zpet {
+  position: absolute; background: var(--sklo-silné); border: 1px solid var(--okraj); color: var(--text);
+  width: 2.75rem; height: 2.75rem; border-radius: var(--r); cursor: pointer; display: grid; place-items: center;
+  font-size: 1.25rem; line-height: 1;
+}
+.lupa__zavrit { top: 1rem; right: 1rem; }
+.lupa__zpet { left: 1rem; top: 50%; transform: translateY(-50%); }
+.lupa__dal { right: 1rem; top: 50%; transform: translateY(-50%); }
+.lupa__zavrit:hover, .lupa__dal:hover, .lupa__zpet:hover { border-color: var(--hrana-skla); color: var(--hrana-skla); }
+
+/* ----------------------------------------------------------------- filtr */
+.filtr { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
+.filtr button {
+  padding: 0.5rem 1rem; border: 1px solid var(--okraj); border-radius: 100px; background: none;
+  color: var(--text-tlumený); cursor: pointer; font-family: var(--f-nadpis); font-weight: 500; font-size: 0.9375rem;
+  transition: border-color var(--přechod), color var(--přechod), background var(--přechod);
+}
+.filtr button:hover { color: var(--text); border-color: var(--okraj-silný); }
+.filtr button[aria-pressed="true"] { background: var(--zlata); border-color: var(--zlata); color: var(--na-akcentu); }
+
+/* --------------------------------------------------------------- formulář */
+.formular { display: grid; gap: 1.1rem; }
+.pole { display: grid; gap: 0.4rem; }
+.pole > label { font-family: var(--f-nadpis); font-weight: 600; font-size: 0.9375rem; }
+.pole__napoveda { color: var(--text-slabý); font-size: 0.85rem; }
+.pole input, .pole textarea, .pole select {
+  width: 100%; padding: 0.75rem 0.9rem; background: var(--plocha-2);
+  border: 1px solid var(--okraj); border-radius: var(--r); color: var(--text);
+  transition: border-color var(--přechod), background var(--přechod);
+}
+.pole input:hover, .pole textarea:hover, .pole select:hover { border-color: var(--okraj-silný); }
+.pole input:focus, .pole textarea:focus, .pole select:focus { border-color: var(--hrana-skla); outline: none; background: var(--plocha-3); }
+.pole textarea { min-height: 9rem; resize: vertical; }
+.pole[data-chyba] input, .pole[data-chyba] textarea { border-color: var(--chyba); }
+.pole__chyba { color: var(--chyba); font-size: 0.875rem; }
+.dvojice { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+
+.nahraj {
+  border: 1px dashed var(--okraj-silný); border-radius: var(--r); padding: 1.5rem;
+  text-align: center; color: var(--text-tlumený); cursor: pointer; background: var(--plocha);
+  transition: border-color var(--přechod), background var(--přechod);
+}
+.nahraj:hover, .nahraj[data-nad="ano"] { border-color: var(--hrana-skla); background: var(--plocha-2); color: var(--text); }
+.nahraj input { display: none; }
+.nahraj__seznam { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; }
+.nahraj__kus { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.6rem; background: var(--plocha-3); border: 1px solid var(--okraj); border-radius: 2px; font-size: 0.85rem; }
+.nahraj__kus button { background: none; border: 0; color: var(--text-slabý); cursor: pointer; padding: 0 0.2rem; }
+.nahraj__kus button:hover { color: var(--chyba); }
+
+.souhlas { display: flex; gap: 0.7rem; align-items: flex-start; font-size: 0.9rem; color: var(--text-tlumený); }
+.souhlas input { margin-top: 0.3rem; flex: none; width: 1.05rem; height: 1.05rem; accent-color: var(--zlata); }
+
+/* ------------------------------------------------------------- upozornění */
+.hlaska {
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  padding: 0.9rem 1.1rem; border-radius: var(--r); border: 1px solid var(--okraj);
+  background: var(--plocha-2); font-size: 0.9375rem; color: var(--text-tlumený);
+}
+.hlaska strong { color: var(--text); }
+.hlaska--ukazka { border-color: rgba(217, 184, 117, 0.4); background: rgba(217, 184, 117, 0.09); }
+.hlaska--v-poradku { border-color: rgba(95, 192, 138, 0.45); background: rgba(95, 192, 138, 0.1); }
+
+/* pruh „tohle je ukázka" nahoře */
+.pruh-ukazky {
+  background: var(--zlata); color: var(--na-akcentu);
+  font-size: 0.875rem; font-weight: 500; text-align: center;
+  padding: 0.5rem var(--okraj-stránky);
+}
+.pruh-ukazky a { color: inherit; font-weight: 600; }
+
+/* ------------------------------------------------------------------ pata */
+.pata { background: var(--plocha); border-top: 1px solid var(--okraj); padding-block: clamp(3rem, 2rem + 3vw, 4.5rem) 1.5rem; }
+.pata__mrizka { display: grid; gap: clamp(2rem, 1rem + 3vw, 3.5rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+.pata h4 { font-family: var(--f-nadpis); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-slabý); margin: 0 0 1rem; }
+.pata ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.55rem; }
+.pata a { color: var(--text-tlumený); text-decoration: none; transition: color var(--přechod); }
+.pata a:hover { color: var(--zlata); }
+.pata__znacka img { height: 3.5rem; width: auto; margin-bottom: 1rem; }
+.pata address { font-style: normal; color: var(--text-tlumený); }
+.pata__doba { display: grid; grid-template-columns: auto auto; gap: 0.35rem 1.25rem; font-size: 0.9375rem; color: var(--text-tlumený); }
+.pata__doba span:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; }
+
+.pata__spodek {
+  margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem); padding-top: 1.5rem; border-top: 1px solid var(--okraj);
+  display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; justify-content: space-between;
+  color: var(--text-slabý); font-size: 0.875rem;
+}
+.podpis-autora { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-slabý); }
+.podpis-autora:hover { color: var(--text-tlumený); }
+.podpis-autora svg { height: 0.95rem; width: auto; }
+
+/* ----------------------------------------------------- odlesk na hraně */
+/* Pomalý světelný přejezd po horní hraně panelu — jako odraz na skle. */
+@media (prefers-reduced-motion: no-preference) {
+  .odlesk { position: relative; overflow: hidden; }
+  .odlesk::after {
+    content: ""; position: absolute; top: -1px; left: -30%; width: 30%; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.85), transparent);
+    animation: prejezd 7s ease-in-out infinite;
+  }
+  @keyframes prejezd {
+    0%, 55% { left: -30%; }
+    85%, 100% { left: 100%; }
+  }
+}
+
+/* telefony v patičce */
+.pata__telefon { display: grid; gap: 0.15rem; margin-bottom: 0.9rem; }
+.pata__role { font-size: 0.8125rem; color: var(--text-slabý); }
+.pata__telefon a { font-family: var(--f-nadpis); font-weight: 600; font-size: 1.0625rem; color: var(--text); }
+.pata__telefon a:hover { color: var(--zlata); }
+
+/* ------------------------------------------------------------------ výzva */
+.vyzva { position: relative; overflow: hidden; }
+.vyzva__foto { position: absolute; inset: 0; }
+.vyzva__foto img { width: 100%; height: 100%; object-fit: cover; }
+.vyzva__foto::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(9, 13, 16, 0.92), rgba(9, 13, 16, 0.6));
+}
+.vyzva__obsah { position: relative; }
+.vyzva__panel { max-width: 40rem; padding: clamp(1.5rem, 1rem + 2.5vw, 2.75rem); }
+.vyzva__panel h2 { margin-bottom: 0.75rem; }
+.vyzva__panel p { color: var(--text-tlumený); }
+
+/* --------------------------------------------------------------- drobky */
+.drobky { padding-top: 1.5rem; font-size: 0.9rem; color: var(--text-slabý); display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.drobky a { color: var(--text-tlumený); text-decoration: none; }
+.drobky a:hover { color: var(--zlata); }
+.drobky [aria-current] { color: var(--text); }
+
+/* --------------------------------------------- detail realizace, kontakt */
+.detail { display: grid; gap: clamp(1.5rem, 1rem + 3vw, 3rem); align-items: start; }
+@media (min-width: 60rem) { .detail { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+.detail__text h1 { margin-bottom: 1rem; text-wrap: balance; }
+.detail__perex { font-size: 1.25rem; color: var(--text); margin-bottom: 1.5rem; }
+.detail__parametry { padding: 1.75rem; position: sticky; top: 6rem; }
+.detail__parametry h2 { font-size: 1.125rem; margin-bottom: 0.5rem; }
+@media (max-width: 60rem) { .detail__parametry { position: static; } }
+
+.kontakt-mrizka { display: grid; gap: clamp(1.5rem, 1rem + 3vw, 2.5rem); align-items: start; }
+@media (min-width: 64rem) { .kontakt-mrizka { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); } }
+.kontakt-strana { display: grid; gap: 1rem; }
+
+/* na široké obrazovce je tlačítko v hlavičce jen jednou (vedle menu) */
+@media (min-width: 62.0625rem) { .menu > .tl { display: none; } }
+
+/* dva sloupce i na širokém, když chceme vyvážený pár */
+.mrizka--pul { grid-template-columns: 1fr; }
+@media (min-width: 52rem) { .mrizka--pul { grid-template-columns: 1fr 1fr; } }
+
+/* tlačítko uvnitř mobilního menu si drží svou barvu textu */
+.menu a.tl--hlavni { color: var(--na-akcentu); }
+.menu a.tl--hlavni:hover { color: var(--na-akcentu); }

@@ -1,0 +1,196 @@
+{
+ "obdobi": "posledních 30 dní",
+ "od": "2026-10-13",
+ "do": "2026-11-11",
+ "poznamka": "Čísla jsou pro ukázku vymyšlená. Na hotovém webu je sem natáhne Google Analytics 4 přes servisní účet — majitelka se do GA4 vůbec nemusí přihlašovat.",
+ "souhrn": [
+  {
+   "klic": "navstevy",
+   "nazev": "Návštěvy",
+   "hodnota": 1284,
+   "zmena": 18,
+   "popis": "lidí, co se na web podívalo"
+  },
+  {
+   "klic": "zobrazeni",
+   "nazev": "Zobrazené stránky",
+   "hodnota": 4126,
+   "zmena": 23,
+   "popis": "kolik stránek si dohromady otevřeli"
+  },
+  {
+   "klic": "poptavky",
+   "nazev": "Odeslané poptávky",
+   "hodnota": 23,
+   "zmena": 44,
+   "popis": "z formuláře na webu"
+  },
+  {
+   "klic": "telefon",
+   "nazev": "Kliknutí na telefon",
+   "hodnota": 61,
+   "zmena": 12,
+   "popis": "hlavně z mobilu"
+  }
+ ],
+ "denne": [
+  32,
+  36,
+  42,
+  47,
+  39,
+  26,
+  23,
+  41,
+  45,
+  49,
+  43,
+  34,
+  24,
+  27,
+  44,
+  50,
+  46,
+  40,
+  35,
+  25,
+  22,
+  47,
+  52,
+  48,
+  44,
+  37,
+  26,
+  24,
+  56,
+  60
+ ],
+ "poptavkyDenne": [
+  0,
+  1,
+  0,
+  2,
+  1,
+  0,
+  0,
+  1,
+  1,
+  2,
+  0,
+  1,
+  0,
+  0,
+  1,
+  2,
+  1,
+  0,
+  1,
+  0,
+  0,
+  2,
+  1,
+  1,
+  0,
+  1,
+  0,
+  0,
+  2,
+  2
+ ],
+ "strankyNejcastejsi": [
+  [
+   "Úvodní stránka",
+   1284
+  ],
+  [
+   "Realizace",
+   618
+  ],
+  [
+   "Sprchové kouty",
+   412
+  ],
+  [
+   "Vnitřní skleněná zábradlí",
+   389
+  ],
+  [
+   "Kontakt a poptávka",
+   341
+  ],
+  [
+   "Zasklívání pergol",
+   207
+  ],
+  [
+   "O nás",
+   184
+  ],
+  [
+   "Zrcadla na míru",
+   162
+  ]
+ ],
+ "zdroje": [
+  [
+   "Vyhledávače",
+   58
+  ],
+  [
+   "Přímý přístup",
+   21
+  ],
+  [
+   "Mapy.cz a Google Maps",
+   13
+  ],
+  [
+   "Sociální sítě",
+   5
+  ],
+  [
+   "Odkazy odjinud",
+   3
+  ]
+ ],
+ "zarizeni": [
+  [
+   "Mobil",
+   64
+  ],
+  [
+   "Počítač",
+   31
+  ],
+  [
+   "Tablet",
+   5
+  ]
+ ],
+ "dotazy": [
+  [
+   "skleněné zábradlí plzeň",
+   94
+  ],
+  [
+   "sprchový kout na míru",
+   71
+  ],
+  [
+   "zasklení pergoly cena",
+   58
+  ],
+  [
+   "sklenářství plzeň",
+   52
+  ],
+  [
+   "zrcadlo na míru plzeň",
+   37
+  ],
+  [
+   "koro sklo",
+   29
+  ]
+ ]
+}

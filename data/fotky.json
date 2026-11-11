@@ -1,0 +1,240 @@
+{
+ "01": {
+  "kod": "01",
+  "sirka": 1920,
+  "vyska": 328,
+  "orientace": "na sirku",
+  "barva": "#cee3f0"
+ },
+ "02": {
+  "kod": "02",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#9c9a8d"
+ },
+ "03": {
+  "kod": "03",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#878683"
+ },
+ "04": {
+  "kod": "04",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#8d8983"
+ },
+ "05": {
+  "kod": "05",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#a39b8e"
+ },
+ "06": {
+  "kod": "06",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#928f87"
+ },
+ "07": {
+  "kod": "07",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#a69e92"
+ },
+ "08": {
+  "kod": "08",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#9d7c5b"
+ },
+ "09": {
+  "kod": "09",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#939391"
+ },
+ "10": {
+  "kod": "10",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#9b8469"
+ },
+ "11": {
+  "kod": "11",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#ab9f8d"
+ },
+ "12": {
+  "kod": "12",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#a0978b"
+ },
+ "13": {
+  "kod": "13",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#7d6851"
+ },
+ "14": {
+  "kod": "14",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#677b8e"
+ },
+ "15": {
+  "kod": "15",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#8d9089"
+ },
+ "16": {
+  "kod": "16",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#8e8d88"
+ },
+ "17": {
+  "kod": "17",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#847b6c"
+ },
+ "18": {
+  "kod": "18",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#9c978f"
+ },
+ "19": {
+  "kod": "19",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#918f85"
+ },
+ "20": {
+  "kod": "20",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#998a79"
+ },
+ "21": {
+  "kod": "21",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#8b9699"
+ },
+ "22": {
+  "kod": "22",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#8e8e8a"
+ },
+ "23": {
+  "kod": "23",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#969993"
+ },
+ "24": {
+  "kod": "24",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#817f77"
+ },
+ "25": {
+  "kod": "25",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#9f9f9a"
+ },
+ "26": {
+  "kod": "26",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#a19585"
+ },
+ "27": {
+  "kod": "27",
+  "sirka": 600,
+  "vyska": 800,
+  "orientace": "na vysku",
+  "barva": "#8d897b"
+ },
+ "28": {
+  "kod": "28",
+  "sirka": 1440,
+  "vyska": 1920,
+  "orientace": "na vysku",
+  "barva": "#8d7b6c"
+ },
+ "29": {
+  "kod": "29",
+  "sirka": 1178,
+  "vyska": 884,
+  "orientace": "na sirku",
+  "barva": "#777269"
+ },
+ "30": {
+  "kod": "30",
+  "sirka": 1440,
+  "vyska": 1920,
+  "orientace": "na vysku",
+  "barva": "#657787"
+ },
+ "31": {
+  "kod": "31",
+  "sirka": 1440,
+  "vyska": 1920,
+  "orientace": "na vysku",
+  "barva": "#a3a09a"
+ },
+ "32": {
+  "kod": "32",
+  "sirka": 1440,
+  "vyska": 1920,
+  "orientace": "na vysku",
+  "barva": "#887c6f"
+ },
+ "33": {
+  "kod": "33",
+  "sirka": 1440,
+  "vyska": 1920,
+  "orientace": "na vysku",
+  "barva": "#797b73"
+ },
+ "34": {
+  "kod": "34",
+  "sirka": 1440,
+  "vyska": 1920,
+  "orientace": "na vysku",
+  "barva": "#8e8e88"
+ }
+}

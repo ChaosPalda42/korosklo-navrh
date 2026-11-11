@@ -1,0 +1,139 @@
+{
+  "uvod": {
+    "fotka": "14",
+    "nadpis": "Sklo na míru pro domy, interiéry i firmy",
+    "perex": "Rodinné sklenářství v Plzni. Od roku 1995 navrhujeme, vyrábíme a montujeme skleněná zábradlí, sprchové kouty, příčky, obklady a zasklení pergol. Vlastní výroba, jeden tým od zaměření po montáž.",
+    "fakta": [
+      ["30 let", "na trhu od roku 1995"],
+      ["Vlastní", "výroba a montáž"],
+      ["Plzeň", "a celý Plzeňský kraj"]
+    ],
+    "vstupy": [
+      {
+        "cil": "sluzby/index.html",
+        "cislo": "01",
+        "nazev": "Zakázky na míru",
+        "text": "Zábradlí, sprchové kouty, příčky, zrcadla, obklady, zasklení pergol. Přijedeme zaměřit, navrhneme řešení, vyrobíme a namontujeme.",
+        "sipka": "Co děláme"
+      },
+      {
+        "cil": "pro-designery.html",
+        "cislo": "02",
+        "nazev": "Designéři, studia a firmy",
+        "text": "Spolupracujeme s interiérovými studii, architekty a firmami, které si sklo montují samy. Dodáme výrobek podle výkresu — nebo celou realizaci.",
+        "sipka": "Jak spolupracujeme"
+      },
+      {
+        "cil": "velkoobchod.html",
+        "cislo": "03",
+        "nazev": "Velkoobchod s plochým sklem",
+        "text": "Tím jsme v roce 1995 začínali a děláme to dál. Ploché sklo, kalení, vrstvení, úpravy hran a formátování podle objednávky.",
+        "sipka": "Velkoobchod"
+      }
+    ],
+    "postup": [
+      ["Poptávka", "Napíšete nám, co potřebujete — stačí fotka a přibližné rozměry. Ozveme se do dvou pracovních dnů."],
+      ["Zaměření a návrh", "Přijedeme na místo, zaměříme a navrhneme řešení. Pak dostanete cenovou nabídku s rozpadem na sklo, kování, montáž a dopravu."],
+      ["Výroba", "Sklo řežeme, brousíme, kalíme a vrstvíme podle schváleného návrhu. Víme, v jaké fázi vaše zakázka je."],
+      ["Montáž", "Namontujeme vlastním týmem, uklidíme a předáme. Na práci i materiál dáváme záruku."]
+    ],
+    "proc": [
+      ["Tři desítky let praxe", "Od roku 1995. Víme, co na jaké místo patří a co vydrží — a co po dvou letech praská."],
+      ["Celá zakázka u jednoho", "Poradenství, zaměření, návrh, výroba i montáž. Nekoordinujete tři firmy a nehledáte, kdo za co může."],
+      ["Vlastní výroba", "Nejsme překupník. Sklo si upravujeme sami, takže držíme termín i kvalitu hran."],
+      ["Plzeň a okolí", "Jsme místní. Na zaměření i na reklamaci přijedeme, ne pošleme e-mail."]
+    ]
+  },
+  "oNas": {
+    "fotka": "22",
+    "nadpis": "Rodinné sklenářství v Plzni od roku 1995",
+    "odstavce": [
+      "Jsme rodinná firma s více než 30letou tradicí. Náš příběh se začal psát v roce 1995, kdy jsme zahájili činnost jako velkoobchod s plochým sklem. Díky poctivé práci, odborným zkušenostem a důrazu na kvalitu jsme postupně rozšířili naše služby o komplexní sklenářské práce a zakázkovou výrobu.",
+      "Dnes realizujeme široké spektrum projektů pro soukromé zákazníky, firmy, architekty, designéry i stavební společnosti. Specializujeme se na výrobu a montáž skleněných zábradlí, sprchových koutů, příček, dveří, obkladů, zrcadel, pergol i dalších skleněných prvků na míru. Každé řešení navrhujeme individuálně s důrazem na precizní zpracování, funkčnost a nadčasový design.",
+      "Spojujeme tradiční řemeslnou práci s moderními technologiemi a kvalitními materiály. Díky vlastní výrobě a zkušenému týmu máme pod kontrolou celý proces realizace – od odborného poradenství, návrhu a zaměření až po samotnou výrobu a profesionální montáž.",
+      "Naším cílem není pouze dodat kvalitní výrobek, ale stát se spolehlivým partnerem, na kterého se můžete obrátit i při těch nejnáročnějších projektech. Každé zakázce věnujeme maximální péči a přistupujeme k ní tak, jako bychom ji realizovali pro sebe.",
+      "Děkujeme všem zákazníkům a obchodním partnerům za důvěru, kterou nám již více než tři desetiletí projevují. Vaše spokojenost je pro nás tou nejlepší vizitkou a motivací neustále posouvat naši práci dál."
+    ],
+    "cisla": [
+      ["1995", "rok založení"],
+      ["30 let", "v oboru"],
+      ["Plzeň", "vlastní provozovna a výroba"]
+    ]
+  },
+  "proDesignery": {
+    "fotka": "18",
+    "nadpis": "Pro designéry, interiérová studia a firmy",
+    "perex": "Část naší práce nekončí u koncového zákazníka. Dodáváme skleněné prvky studiím, architektům a firmám, které si montáž zajišťují samy — i těm, které chtějí celou realizaci převzít od nás.",
+    "bloky": [
+      {
+        "nadpis": "Dodávka podle výkresu",
+        "text": "Pošlete výkres nebo rozměrový list a my vyrobíme. Kalení, vrstvení, broušení hran, výřezy pro kování, pískování, lakobel v odstínu RAL. Zabalíme na stojan a připravíme k odběru nebo dovezeme.",
+        "odrazky": [
+          "Kalené a vrstvené sklo podle ČSN",
+          "Výřezy, otvory a zápichy podle kování",
+          "Broušení a fazetování hran",
+          "Lakobel a pískované vzory"
+        ]
+      },
+      {
+        "nadpis": "Celá realizace pod naší hlavičkou",
+        "text": "Když nechcete řešit montáž, převezmeme ji. Přijedeme zaměřit na stavbu, dořešíme detaily s vámi i s klientem a namontujeme. Vy máte jednoho dodavatele a jednu záruku.",
+        "odrazky": [
+          "Zaměření na stavbě i podle vašeho projektu",
+          "Konzultace řešení detailů a kování",
+          "Montáž vlastním týmem",
+          "Jedna faktura, jedna záruka"
+        ]
+      },
+      {
+        "nadpis": "Technické poradenství",
+        "text": "Než se sklo nakreslí, vyplatí se zavolat. Řekneme, jaká tloušťka na daný rozpon patří, co norma u zábradlí vyžaduje a kde se dá ušetřit bez ztráty kvality.",
+        "odrazky": [
+          "Volba tloušťky a skladby skla",
+          "Požadavky norem u zábradlí a dělicích stěn",
+          "Možnosti kotvení a kování",
+          "Reálné dodací termíny"
+        ]
+      }
+    ],
+    "poznamka": "Pracujeme i jako subdodavatel, takže vaše jméno zůstává na projektu. Konkrétní studia a firmy proto neuvádíme — pokud potřebujete referenci na jmenovitou spolupráci, rádi ji dáme na vyžádání."
+  },
+  "velkoobchod": {
+    "fotka": "17",
+    "nadpis": "Velkoobchod s plochým sklem",
+    "perex": "Tím jsme v roce 1995 začínali. Dodáváme ploché sklo a jeho úpravy sklenářům, truhlářům, stavebním firmám a výrobcům nábytku v Plzni a okolí.",
+    "sortiment": [
+      ["Float a čiré sklo", "tloušťky 2–19 mm, formátování podle objednávky"],
+      ["Kalené sklo (ESG)", "pro zábradlí, sprchy, dveře a technické aplikace"],
+      ["Vrstvené sklo (VSG)", "bezpečnostní skladby s fólií, i barevnou"],
+      ["Zrcadla", "stříbřená, s broušenou hranou nebo fazetou"],
+      ["Lakobel a barevné sklo", "odstíny podle RAL, na obklady a nábytek"],
+      ["Ornamentní a matovaná skla", "na dveře, příčky a nábytkové výplně"]
+    ],
+    "sluzby": [
+      "Řezání a formátování na rozměr",
+      "Broušení, fazetování a polishing hran",
+      "Vrtání otvorů a výřezy podle kování",
+      "Kalení a vrstvení",
+      "Pískování a lepení",
+      "Dovoz na stojanech po Plzeňském kraji"
+    ],
+    "poznamka": "Velkoobchod vedeme dál, ale hlavní směr firmy je dnes zakázková výroba na míru. Pro ceník a dostupnost zavolejte na kancelář — objednávky řešíme individuálně podle množství a formátu."
+  },
+  "kontakt": {
+    "nadpis": "Napište nám, co potřebujete",
+    "perex": "Stačí přibližné rozměry a fotka místa. Ozveme se do dvou pracovních dnů a řekneme, jestli to jde, jak a za kolik. Poptávka je nezávazná a zdarma.",
+    "napoveda": "Pomůže nám: kde to je (město), co to má být, přibližné rozměry a jestli už máte představu o kování nebo barvě. Fotka místa je lepší než tři odstavce popisu."
+  },
+  "gdpr": {
+    "nadpis": "Ochrana osobních údajů",
+    "odstavce": [
+      "Správcem osobních údajů je KORO-SKLO s.r.o., IČO 64357783, se sídlem Na Roudné 1134/68, 301 00 Plzeň.",
+      "Údaje z poptávkového formuláře (jméno, telefon, e-mail, text zprávy a případné přiložené fotografie) zpracováváme výhradně proto, abychom mohli odpovědět na vaši poptávku a připravit cenovou nabídku. Právním základem je oprávněný zájem, respektive jednání o smlouvě.",
+      "Údaje neposkytujeme třetím stranám k marketingovým účelům a nepoužíváme je k zasílání obchodních nabídek, pokud o to výslovně nepožádáte. Uchováváme je po dobu nezbytnou k vyřízení poptávky, nejdéle však tři roky od posledního kontaktu.",
+      "Máte právo na přístup ke svým údajům, jejich opravu nebo výmaz, na omezení zpracování a na vznesení námitky. Stačí napsat na info@korosklo.cz.",
+      "Web používá pouze technicky nezbytné cookies a anonymizované měření návštěvnosti. Žádné reklamní ani profilovací cookies nenasazujeme."
+    ],
+    "poznamka": "Toto je vzorový text pro ukázku webu. Před spuštěním ho doporučujeme nechat zkontrolovat — doplní se skutečná doba uchování, zpracovatelé (hosting, e-mail) a případné měření návštěvnosti."
+  }
+}

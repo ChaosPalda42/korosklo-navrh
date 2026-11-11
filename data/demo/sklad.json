@@ -1,0 +1,230 @@
+{
+ "karty": [
+  {
+   "kod": "ESG-08-CIRE",
+   "nazev": "Kalené sklo ESG 8 mm čiré",
+   "jednotka": "m²",
+   "naSklade": 42.5,
+   "rezervovano": 12,
+   "limit": 15,
+   "cena": 1180,
+   "umisteni": "Stojan A1"
+  },
+  {
+   "kod": "ESG-10-CIRE",
+   "nazev": "Kalené sklo ESG 10 mm čiré",
+   "jednotka": "m²",
+   "naSklade": 21.0,
+   "rezervovano": 4,
+   "limit": 10,
+   "cena": 1460,
+   "umisteni": "Stojan A2"
+  },
+  {
+   "kod": "VSG-882",
+   "nazev": "Vrstvené sklo VSG 8.8.2 čiré",
+   "jednotka": "m²",
+   "naSklade": 18.4,
+   "rezervovano": 10.4,
+   "limit": 12,
+   "cena": 1980,
+   "umisteni": "Stojan B1"
+  },
+  {
+   "kod": "VSG-884",
+   "nazev": "Vrstvené sklo VSG 8.8.4 čiré",
+   "jednotka": "m²",
+   "naSklade": 6.0,
+   "rezervovano": 0,
+   "limit": 10,
+   "cena": 2240,
+   "umisteni": "Stojan B2"
+  },
+  {
+   "kod": "FLOAT-04",
+   "nazev": "Float čirý 4 mm",
+   "jednotka": "m²",
+   "naSklade": 96.0,
+   "rezervovano": 0,
+   "limit": 30,
+   "cena": 320,
+   "umisteni": "Stojan C1"
+  },
+  {
+   "kod": "FLOAT-06",
+   "nazev": "Float čirý 6 mm",
+   "jednotka": "m²",
+   "naSklade": 54.0,
+   "rezervovano": 6,
+   "limit": 25,
+   "cena": 450,
+   "umisteni": "Stojan C2"
+  },
+  {
+   "kod": "ZRC-04",
+   "nazev": "Zrcadlo stříbřené 4 mm",
+   "jednotka": "m²",
+   "naSklade": 7.2,
+   "rezervovano": 1.66,
+   "limit": 10,
+   "cena": 760,
+   "umisteni": "Stojan D1"
+  },
+  {
+   "kod": "ZRC-06",
+   "nazev": "Zrcadlo stříbřené 6 mm",
+   "jednotka": "m²",
+   "naSklade": 12.5,
+   "rezervovano": 0,
+   "limit": 6,
+   "cena": 980,
+   "umisteni": "Stojan D2"
+  },
+  {
+   "kod": "LAKO-9016",
+   "nazev": "Lakobel RAL 9016 bílá, 6 mm",
+   "jednotka": "m²",
+   "naSklade": 14.0,
+   "rezervovano": 0,
+   "limit": 8,
+   "cena": 1240,
+   "umisteni": "Stojan E1"
+  },
+  {
+   "kod": "LAKO-9005",
+   "nazev": "Lakobel RAL 9005 černá, 6 mm",
+   "jednotka": "m²",
+   "naSklade": 3.5,
+   "rezervovano": 0,
+   "limit": 6,
+   "cena": 1240,
+   "umisteni": "Stojan E2"
+  },
+  {
+   "kod": "SATINATO-08",
+   "nazev": "Satináto 8 mm",
+   "jednotka": "m²",
+   "naSklade": 9.8,
+   "rezervovano": 0,
+   "limit": 5,
+   "cena": 1680,
+   "umisteni": "Stojan F1"
+  },
+  {
+   "kod": "TERC-304",
+   "nazev": "Nerezový bodový terč AISI 304",
+   "jednotka": "ks",
+   "naSklade": 86,
+   "rezervovano": 14,
+   "limit": 40,
+   "cena": 620,
+   "umisteni": "Regál 3"
+  },
+  {
+   "kod": "UPROF-AL",
+   "nazev": "Hliníkový U profil, elox stříbrný",
+   "jednotka": "bm",
+   "naSklade": 12,
+   "rezervovano": 0,
+   "limit": 24,
+   "cena": 1150,
+   "umisteni": "Regál 1"
+  },
+  {
+   "kod": "KOV-CERNE",
+   "nazev": "Kování sprchové, černé matné, sada",
+   "jednotka": "kpl",
+   "naSklade": 4,
+   "rezervovano": 0,
+   "limit": 6,
+   "cena": 2850,
+   "umisteni": "Regál 4"
+  },
+  {
+   "kod": "KOV-CHROM",
+   "nazev": "Kování sprchové, chrom, sada",
+   "jednotka": "kpl",
+   "naSklade": 9,
+   "rezervovano": 1,
+   "limit": 5,
+   "cena": 2450,
+   "umisteni": "Regál 4"
+  },
+  {
+   "kod": "LEP-ZRC",
+   "nazev": "Lepicí sada na zrcadla",
+   "jednotka": "kpl",
+   "naSklade": 23,
+   "rezervovano": 2,
+   "limit": 10,
+   "cena": 240,
+   "umisteni": "Regál 5"
+  }
+ ],
+ "pohyby": [
+  {
+   "kdy": "2026-11-11",
+   "kod": "ESG-08-CIRE",
+   "druh": "prijem",
+   "mnozstvi": 18.0,
+   "popis": "Dodávka z kalírny, faktura 2026-4417",
+   "kdo": "Pavel"
+  },
+  {
+   "kdy": "2026-11-10",
+   "kod": "VSG-882",
+   "druh": "rezervace",
+   "mnozstvi": 10.4,
+   "popis": "Zakázka Z-2026-0031 — zábradlí Dvořák",
+   "kdo": "Jana"
+  },
+  {
+   "kdy": "2026-11-10",
+   "kod": "TERC-304",
+   "druh": "rezervace",
+   "mnozstvi": 14,
+   "popis": "Zakázka Z-2026-0031",
+   "kdo": "Jana"
+  },
+  {
+   "kdy": "2026-11-08",
+   "kod": "ESG-08-CIRE",
+   "druh": "vydej",
+   "mnozstvi": 2.3,
+   "popis": "Sprchová zástěna — vzorek pro Marešovou",
+   "kdo": "Pavel"
+  },
+  {
+   "kdy": "2026-11-07",
+   "kod": "ZRC-04",
+   "druh": "vydej",
+   "mnozstvi": 1.8,
+   "popis": "Truhlářství Kodet, odběr na provozovně",
+   "kdo": "Jana"
+  },
+  {
+   "kdy": "2026-11-06",
+   "kod": "LAKO-9016",
+   "druh": "vydej",
+   "mnozstvi": 3.2,
+   "popis": "Truhlářství Kodet, odběr na provozovně",
+   "kdo": "Jana"
+  },
+  {
+   "kdy": "2026-11-05",
+   "kod": "FLOAT-04",
+   "druh": "prijem",
+   "mnozstvi": 40.0,
+   "popis": "Dodávka plochého skla",
+   "kdo": "Pavel"
+  },
+  {
+   "kdy": "2026-11-03",
+   "kod": "KOV-CERNE",
+   "druh": "vydej",
+   "mnozstvi": 2,
+   "popis": "Hotel Zelená Hora, etapa I — doplnění",
+   "kdo": "Pavel"
+  }
+ ]
+}
