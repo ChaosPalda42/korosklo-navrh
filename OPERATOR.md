@@ -124,3 +124,7 @@ Zadání: ukázka faktur. Druhá polovina zadání z 12. 11.
 - Opravená i stará chyba v `crm.mjs`: hlavička dodavatele brala
   `site.ulice/psc/mesto/ico`, které v `site.json` nejsou, takže na nabídce
   byla prázdná adresa a „IČ “. Teď to sází jeden společný `znackaDodavatele`.
+- Návrh 2026-0115 nemá datum vystavení ani splatnost (v seznamu i na dokladu
+  je pomlčka) — jinak by řádek tvrdil „vystaveno 10. 11.“ a zároveň nabízel
+  tlačítko *Vystavit*. Datum dosadí až vystavení. V historii klienta se
+  nevystavená faktura neukazuje.

@@ -652,7 +652,7 @@ export function klienti(ctx) {
         kam: `administrace/crm/nabidka-${n.cislo}.html`,
       })),
       ...jehoZakazky.map((z) => ({ kdy: z.zahajeno, co: `Zakázka ${h(z.id)} — ${h(z.nazev)}`, kam: "administrace/crm/zakazky.html" })),
-      ...jehoFaktury.map((f) => ({ kdy: f.vystaveno, co: `Faktura ${h(f.cislo)} — ${koruny(f.celkem)}`, kam: "administrace/crm/faktury.html" })),
+      ...jehoFaktury.filter((f) => f.vystaveno).map((f) => ({ kdy: f.vystaveno, co: `Faktura ${h(f.cislo)} — ${koruny(f.celkem)}`, kam: "administrace/crm/faktury.html" })),
     ].sort((a, b) => (a.kdy < b.kdy ? 1 : -1));
 
     const seznamHistorie = historie.length
@@ -984,8 +984,8 @@ export function faktury(ctx) {
         f.zNabidky
           ? `<a href="${odkaz(stranka, `administrace/crm/nabidka-${f.zNabidky}.html`)}">${h(f.zNabidky)}</a>`
           : `<span style="color:var(--text-slabý)">—</span>`,
-        `<span data-vystaveno-text>${h(datumKratce(f.vystaveno))}</span>`,
-        `<span data-splatnost-text>${h(datumKratce(f.splatnost))}</span>`
+        `<span data-vystaveno-text>${f.vystaveno ? h(datumKratce(f.vystaveno)) : "—"}</span>`,
+        `<span data-splatnost-text>${f.splatnost ? h(datumKratce(f.splatnost)) : "—"}</span>`
         + `<span class="tabulka__pod" data-po-splatnosti${poSplatnosti ? "" : " hidden"}>`
         + (poSplatnosti ? `+${sMnoznym(poSplatnosti, ["den", "dny", "dní"])}` : "") + `</span>`,
         `<span data-odznak>${odznakZeSlovniku(STAVY_FAKTUR, stav)}</span>`,
