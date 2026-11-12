@@ -76,3 +76,20 @@ Rozhodnuto a uděláno:
 Práce běžela ve zkušební kopii ve scratchpadu, protože na projektu jel
 `factory run`; do repozitáře šla až po zeleném běhu, bez obou ručních
 náhražek knihoven.
+
+## 2026-11-12 — přílohy u zakázek se štítky
+
+Zadání: k zakázce se musí dát nahrát soubory a každý nese štítek, aby bylo
+na první pohled vidět, co v příloze je.
+
+- Logika je kontrakt **C-007** `src/lib/prilohy.mjs` (sedm štítků, odhad
+  štítku ze jména souboru bez diakritiky, druh podle přípony, lidská
+  velikost, limity 20 souborů / 15 MB, řazení a počty). Factory zelená
+  na třetí iteraci, 226 testů.
+- Administrace jen volá ten modul — prohlížeč si ho bere z
+  `assets/lib/prilohy.mjs`, takže web i administrace počítají totéž.
+- Řádek zakázky má sponu s počtem, souhrn po štítcích, seznam příloh
+  s volbou štítku (přebarvená podle štítku) a plochu na přetažení souborů.
+- V ukázce se nic nenahrává: hlášky říkají, co by se stalo. Hlídá to
+  `tests/test_predavka.py`, kde je nově i počet příloh proti
+  `data/demo/zakazky.json`.

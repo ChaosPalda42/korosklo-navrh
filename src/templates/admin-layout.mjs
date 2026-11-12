@@ -43,6 +43,10 @@ const TAHY = {
   pokles: '<path d="m4 8 5 5 3.5-3L20 17"/><path d="M15.5 17H20v-4.5"/>',
   tuzka: '<path d="M4 20h4l10-10a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="M13.5 6.5l4 4"/>',
   uloz: '<path d="M5.5 3.5h10L20 8v12.5H5.5z"/><path d="M8.5 3.5v5h7v-5"/><path d="M8.5 20.5v-6h7v6"/>',
+  spona: '<path d="M18 9.5 10.5 17a3.5 3.5 0 0 1-5-5l8-8a2.4 2.4 0 0 1 3.4 3.4l-8 8a1.3 1.3 0 0 1-1.8-1.8l7-7"/>',
+  soubor: '<path d="M6 2.75h8L18.5 7v14.25H6Z"/><path d="M13.75 3v4.25H18"/>',
+  tabulka: '<rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 9.5v10"/>',
+  stahnout: '<path d="M12 3.5v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4.5 18.5h15"/>',
   prazdne: '<path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z"/><path d="M4 8.5 12 13l8-4.5"/>',
 };
 

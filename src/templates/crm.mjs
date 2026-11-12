@@ -11,6 +11,8 @@ import { polozkaCelkem, souhrn, stavPlatnosti } from "../lib/nabidka.mjs";
 import { stavKarty, podLimitem, hodnotaSkladu } from "../lib/sklad.mjs";
 import { stavFaktury, dnuPoSplatnosti, prehled, variabilniSymbol } from "../lib/faktura.mjs";
 import { postup, pocty, serad, jeVBehu } from "../lib/zakazky.mjs";
+import { STITKY, serad as seradPrilohy, pocty as poctyPriloh, velikost }
+  from "../lib/prilohy.mjs";
 import { kdy } from "../lib/kdy.mjs";
 import { ikona, karta, odznak, poznamka, popis, tabulka, rozbal, prazdno } from "./admin-layout.mjs";
 
@@ -31,6 +33,25 @@ const STAVY_ZAKAZEK = {
   vyroba: ["Ve výrobě", "modra"],
   montaz: ["Montáž", "zlata"],
   hotovo: ["Hotovo", "zelena"],
+};
+
+const STITKY_PRILOH = {
+  smlouva: ["Smlouva", "modra"],
+  zamereni: ["Zaměření", "zlata"],
+  navrh: ["Návrh", "zlata"],
+  foto: ["Fotka", "zelena"],
+  faktura: ["Faktura", "modra"],
+  atest: ["Atest", ""],
+  jine: ["Ostatní", ""],
+};
+
+const IKONA_DRUHU = {
+  obrazek: "fotka",
+  pdf: "soubor",
+  dokument: "soubor",
+  tabulka: "tabulka",
+  vykres: "soubor",
+  jine: "soubor",
 };
 
 const STAVY_FAKTUR = {
@@ -424,8 +445,9 @@ export function zakazky(ctx) {
       + `<p>Zkuste jiný filtr nebo jiné slovo.</p></div>`,
     tesne: true,
     pata: "Hotové zakázky se schovají samy — filtr nahoře je kdykoli vytáhne zpátky. "
-      + "Stav se dá přepnout přímo v řádku, krok odškrtnout kliknutím.",
-  });
+      + "Stav se dá přepnout přímo v řádku, krok odškrtnout kliknutím. "
+      + "Přílohy se štítkem drží smlouvu, zaměření i fotky u jedné zakázky.",
+  }) + vzorPrilohy();
 
   return {
     titulek: "Zakázky",
@@ -449,6 +471,9 @@ function zakazkaRadek(ctx, z) {
     + `<span class="tabulka__pod">${h(k?.jmeno ?? "—")}</span>`;
   const vedle = (jeVBehu(z) && z.terminMontaze
     ? `<span class="tabulka__pod">montáž ${h(kdy(z.terminMontaze, dnes))}</span>` : "")
+    + `<span class="spinatko" data-pocet-priloh${(z.prilohy ?? []).length ? "" : " hidden"}`
+    + ` title="Přílohy">${ikona("spona")}`
+    + `<span data-pocet-priloh-cislo>${cislo((z.prilohy ?? []).length)}</span></span>`
     + `<span data-kroky>${stav.hotovych}/${stav.celkem} kroků</span>`
     + `<span data-odznak>${odznakZeSlovniku(STAVY_ZAKAZEK, z.stav)}</span>`;
 
@@ -511,9 +536,11 @@ function zakazkaRadek(ctx, z) {
   <button type="button" class="tl tl--maly" data-smazat-ne>Nechat</button>
 </div>`;
 
+  const prilohyHtml = prilohySekce(z);
+
   const telo = akce + prehledHtml + uprava
     + `<p class="ryska" style="margin-top:1.25rem">Kde to stojí</p>`
-    + postupHtml;
+    + postupHtml + prilohyHtml;
 
   const proHledani = [z.id, z.nazev, z.nabidka, z.poznamka, k?.jmeno, k?.mesto]
     .filter(Boolean).join(" ");
@@ -532,6 +559,63 @@ function zakazkaRadek(ctx, z) {
       "data-nabidka": z.nabidka || "",
     },
   });
+}
+
+/** Jedna příloha v seznamu. Stejná značka se používá i jako vzor pro JS,
+ *  aby nahraný soubor vypadal přesně jako ten, co přišel ze sestavení. */
+function prilohaPolozka(x) {
+  const volby = STITKY
+    .map((s) => `<option value="${h(s)}"${s === x.stitek ? " selected" : ""}>`
+      + `${h(STITKY_PRILOH[s][0])}</option>`)
+    .join("");
+  return `<li data-priloha data-stitek="${h(x.stitek)}" data-nazev="${h(x.nazev)}"
+    data-velikost="${h(String(x.velikost ?? 0))}" data-druh="${h(x.druh ?? "jine")}"
+    data-kdy="${h(x.kdy ?? "")}">
+  <span class="priloha__znak">${ikona(IKONA_DRUHU[x.druh] ?? "soubor")}</span>
+  <span class="priloha__nazev" data-zobraz="nazev">${h(x.nazev)}</span>
+  <span class="priloha__meta" data-zobraz="meta">${h(velikost(x.velikost))}${
+    x.kdy ? " · " + h(datumKratce(x.kdy)) : ""}</span>
+  <select class="stitek-volba netisknout" data-stitek-volba
+          aria-label="Štítek přílohy ${h(x.nazev)}">${volby}</select>
+  <span class="stitek-tisk tisk-jen">${h(STITKY_PRILOH[x.stitek]?.[0] ?? x.stitek)}</span>
+  <button type="button" class="priloha__tl netisknout" data-stahnout
+          title="Stáhnout ${h(x.nazev)}">${ikona("stahnout")}</button>
+  <button type="button" class="priloha__tl priloha__tl--pryc netisknout" data-priloha-pryc
+          title="Odebrat ${h(x.nazev)}">${ikona("koš")}</button>
+</li>`;
+}
+
+/** Přílohy zakázky: seznam se štítky, souhrn po štítcích a nahrávání. */
+function prilohySekce(z) {
+  const prilohy = seradPrilohy(z.prilohy ?? []);
+  const p = poctyPriloh(prilohy);
+
+  const souhrnStitku = STITKY
+    .filter((s) => p.podleStitku[s] > 0)
+    .map((s) => `<span class="stitek-pocet" data-stitek-pocet="${h(s)}">`
+      + odznakZeSlovniku(STITKY_PRILOH, s)
+      + `<span data-cislo>${cislo(p.podleStitku[s])}</span></span>`)
+    .join("");
+
+  return `<div class="prilohy" data-prilohy>
+  <p class="ryska" style="margin-top:1.25rem">Přílohy
+    <span class="stitky-souhrn" data-stitky-souhrn>${souhrnStitku}</span></p>
+  <ul class="prilohy__seznam" data-prilohy-seznam>${prilohy.map(prilohaPolozka).join("")}</ul>
+  <p class="prilohy__prazdno" data-prilohy-prazdno${prilohy.length ? " hidden" : ""}>Zatím tu nic není.
+    Smlouva, zaměření, návrh i fotky z montáže patří sem — ať je všechno u zakázky pohromadě.</p>
+  <div class="nahraj nahraj--priloha netisknout" data-prilohy-nahraj>
+    <input type="file" id="soubory-${h(z.id)}" multiple hidden>
+    <label class="tl tl--maly" for="soubory-${h(z.id)}">${ikona("pridat")} Přidat soubory</label>
+    <span class="nahraj__text">nebo je sem přetáhněte — štítek se podle názvu nabídne sám</span>
+  </div>
+</div>`;
+}
+
+/** Vzor jedné přílohy pro JS: na stránce jednou, mimo seznamy. */
+function vzorPrilohy() {
+  return `<template data-vzor-prilohy>`
+    + prilohaPolozka({ nazev: "", velikost: 0, stitek: "jine", druh: "jine", kdy: "" })
+    + `</template>`;
 }
 
 /* ---------------------------------------------------------------- klienti */

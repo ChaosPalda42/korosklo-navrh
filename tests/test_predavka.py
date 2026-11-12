@@ -62,6 +62,10 @@ def pocty() -> dict[str, tuple[str, int]]:
         "skladové karty": (r"\*\*(\d+) skladových karet\*\*", len(sklad["karty"])),
         "pohyby na skladě": (r"a (\d+) pohybů na skladě", len(sklad["pohyby"])),
         "faktury": (r"\*\*(\d+) faktur\*\*", len(nacti("demo/faktury.json"))),
+        "přílohy zakázek": (
+            r"\*\*(\d+) příloh u zakázek\*\*",
+            sum(len(z.get("prilohy", [])) for z in nacti("demo/zakazky.json")),
+        ),
     }
 
 

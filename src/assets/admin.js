@@ -4,10 +4,12 @@
  */
 
 import { polozkaCelkem, souhrn } from "./lib/nabidka.mjs";
-import { koruny, datum } from "./lib/cestina.mjs";
+import { koruny, datum, datumKratce } from "./lib/cestina.mjs";
 import { kdy } from "./lib/kdy.mjs";
 import { postup, pocty, filtruj, dalsiStav, zmenStav, oznacKrok, STAVY }
   from "./lib/zakazky.mjs";
+import { STITKY, prijmi, pocty as poctyPriloh, serad as seradPrilohy, velikost }
+  from "./lib/prilohy.mjs";
 
 /** Den, ke kterému je ukázka postavená (sestavení ho dá do <body>). */
 const DNES = document.body.dataset.dnes || new Date().toISOString().slice(0, 10);
@@ -533,11 +535,168 @@ function nastavStav(radek, stav, obal) {
     : `Stav je teď „${STAV_ZAKAZKY[stav][0]}“. V ostré verzi se zapíše i to, kdo ho změnil.`);
 }
 
+/* --------------------------------------------------------------- přílohy */
+
+const STITKY_PRILOH = {
+  smlouva: ["Smlouva", "modra"],
+  zamereni: ["Zaměření", "zlata"],
+  navrh: ["Návrh", "zlata"],
+  foto: ["Fotka", "zelena"],
+  faktura: ["Faktura", "modra"],
+  atest: ["Atest", ""],
+  jine: ["Ostatní", ""],
+};
+
+/** Přílohy tak, jak je zrovna vidí stránka. */
+function prilohyZeStranky(seznam) {
+  return [...seznam.querySelectorAll("[data-priloha]")].map((el) => ({
+    el,
+    nazev: el.dataset.nazev,
+    velikost: Number(el.dataset.velikost) || 0,
+    stitek: el.dataset.stitek,
+    druh: el.dataset.druh,
+    kdy: el.dataset.kdy || "",
+  }));
+}
+
+/** Souhrn štítků nad seznamem a sponka v hlavičce řádku. */
+function prekresliPrilohy(radek) {
+  const obal = radek.querySelector("[data-prilohy]");
+  if (!obal) return;
+  const seznam = obal.querySelector("[data-prilohy-seznam]");
+  const prilohy = prilohyZeStranky(seznam);
+  const p = poctyPriloh(prilohy);
+
+  obal.querySelector("[data-stitky-souhrn]").innerHTML = STITKY
+    .filter((s) => p.podleStitku[s] > 0)
+    .map((s) => {
+      const [nazev, barva] = STITKY_PRILOH[s];
+      return `<span class="stitek-pocet" data-stitek-pocet="${s}">`
+        + `<span class="odznak${barva ? ` odznak--${barva}` : ""}">${nazev}</span>`
+        + `<span data-cislo>${p.podleStitku[s]}</span></span>`;
+    }).join("");
+
+  obal.querySelector("[data-prilohy-prazdno]").hidden = p.celkem > 0;
+
+  const spinatko = radek.querySelector("[data-pocet-priloh]");
+  if (spinatko) {
+    spinatko.hidden = p.celkem === 0;
+    spinatko.querySelector("[data-pocet-priloh-cislo]").textContent = String(p.celkem);
+  }
+
+  /* pořadí podle štítků — stejně, jako to seřadí sestavení */
+  for (const x of seradPrilohy(prilohy)) seznam.appendChild(x.el);
+}
+
+/** Nová položka seznamu ze vzoru na stránce. */
+function vyrobPrilohu(priloha) {
+  const vzor = document.querySelector("[data-vzor-prilohy]");
+  const el = vzor.content.firstElementChild.cloneNode(true);
+  el.dataset.nazev = priloha.nazev;
+  el.dataset.velikost = String(priloha.velikost);
+  el.dataset.stitek = priloha.stitek;
+  el.dataset.druh = priloha.druh;
+  el.dataset.kdy = priloha.kdy;
+  el.querySelector("[data-zobraz='nazev']").textContent = priloha.nazev;
+  el.querySelector("[data-zobraz='meta']").textContent =
+    velikost(priloha.velikost) + (priloha.kdy ? " · " + datumKratce(priloha.kdy) : "");
+  const volba = el.querySelector("[data-stitek-volba]");
+  volba.value = priloha.stitek;
+  volba.setAttribute("aria-label", `Štítek přílohy ${priloha.nazev}`);
+  el.querySelector(".stitek-tisk").textContent = STITKY_PRILOH[priloha.stitek][0];
+  el.querySelector("[data-stahnout]").title = `Stáhnout ${priloha.nazev}`;
+  el.querySelector("[data-priloha-pryc]").title = `Odebrat ${priloha.nazev}`;
+  return el;
+}
+
+const DUVODY = {
+  velky: (n) => `Soubor ${n} je větší než 15 MB. Takhle velké přílohy se posílají odkazem.`,
+  duplicitni: (n) => `Soubor ${n} už u zakázky je.`,
+  plno: () => "U jedné zakázky může být nejvýš 20 příloh.",
+};
+
+/** Přidání souborů — z tlačítka i z přetažení. */
+function pridejPrilohy(radek, soubory) {
+  const seznam = radek.querySelector("[data-prilohy-seznam]");
+  const stavajici = prilohyZeStranky(seznam);
+  const { prijate, odmitnute } = prijmi(
+    stavajici,
+    [...soubory].map((f) => ({ nazev: f.name, velikost: f.size })),
+    { kdy: DNES },
+  );
+  for (const x of prijate) seznam.appendChild(vyrobPrilohu(x));
+  prekresliPrilohy(radek);
+
+  if (odmitnute.length) {
+    const prvni = odmitnute[0];
+    hlaska(DUVODY[prvni.duvod](prvni.nazev));
+    return;
+  }
+  if (!prijate.length) return;
+  const stitky = [...new Set(prijate.map((x) => STITKY_PRILOH[x.stitek][0]))];
+  hlaska(prijate.length === 1
+    ? `Soubor by se nahrál a dostal štítek „${stitky[0]}“. Štítek jde přepsat.`
+    : `${prijate.length} soubory by se nahrály se štítky ${stitky.map((s) => `„${s}“`).join(", ")}.`);
+}
+
+function prilohyAkce(obal) {
+  obal.addEventListener("click", (e) => {
+    const radek = e.target.closest("[data-zakazka]");
+    const polozka = e.target.closest("[data-priloha]");
+    if (!radek || !polozka) return;
+
+    if (e.target.closest("[data-stahnout]")) {
+      hlaska(`Soubor ${polozka.dataset.nazev} by se stáhl. V ukázce je jenom v seznamu.`);
+      return;
+    }
+    if (e.target.closest("[data-priloha-pryc]")) {
+      const jmeno = polozka.dataset.nazev;
+      polozka.remove();
+      prekresliPrilohy(radek);
+      hlaska(`Příloha ${jmeno} by se odebrala. U zakázky zůstane stopa, kdo ji smazal.`);
+    }
+  });
+
+  obal.addEventListener("change", (e) => {
+    const volba = e.target.closest("[data-stitek-volba]");
+    if (volba) {
+      const polozka = volba.closest("[data-priloha]");
+      polozka.dataset.stitek = volba.value;
+      polozka.querySelector(".stitek-tisk").textContent = STITKY_PRILOH[volba.value][0];
+      prekresliPrilohy(e.target.closest("[data-zakazka]"));
+      hlaska(`Štítek je teď „${STITKY_PRILOH[volba.value][0]}“. Takhle je na první pohled vidět, co v příloze je.`);
+      return;
+    }
+    const vstup = e.target.closest("[data-prilohy-nahraj] input[type=file]");
+    if (!vstup || !vstup.files.length) return;
+    pridejPrilohy(e.target.closest("[data-zakazka]"), vstup.files);
+    vstup.value = "";
+  });
+
+  /* přetažení souborů na zakázku */
+  for (const zona of obal.querySelectorAll("[data-prilohy-nahraj]")) {
+    ["dragenter", "dragover"].forEach((t) => zona.addEventListener(t, (e) => {
+      e.preventDefault();
+      zona.setAttribute("data-nad", "ano");
+    }));
+    ["dragleave", "drop"].forEach((t) => zona.addEventListener(t, (e) => {
+      e.preventDefault();
+      zona.removeAttribute("data-nad");
+    }));
+    zona.addEventListener("drop", (e) => {
+      if (e.dataTransfer?.files?.length) {
+        pridejPrilohy(zona.closest("[data-zakazka]"), e.dataTransfer.files);
+      }
+    });
+  }
+}
+
 function zakazky() {
   const obal = document.querySelector("#seznam-zakazek");
   if (!obal) return;
   zakazkyFiltr(obal);
   zakazkyAkce(obal);
+  prilohyAkce(obal);
   prefiltrujZakazky(obal);
 
   for (const tl of document.querySelectorAll("[data-nova-zakazka]")) {

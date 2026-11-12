@@ -34,6 +34,8 @@ a jak by se v tom pracovalo, ne o skutečné zákazníky.
 - **10 klientů** v kartotéce — jména, firmy, IČ, adresy, poznámky.
 - **9 cenových nabídek** — čísla, položky, ceny, slevy, platnost.
 - **4 zakázky** s postupem prací.
+- **16 příloh u zakázek** — jen jména souborů se štítky (smlouva, zaměření,
+  návrh, fotka, atest). Žádné soubory v ukázce nejsou a nic se nenahrává.
 - **16 skladových karet** a 8 pohybů na skladě.
 - **8 faktur** včetně částek a splatností.
 

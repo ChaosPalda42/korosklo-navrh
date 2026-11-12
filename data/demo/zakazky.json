@@ -34,7 +34,44 @@
     false
    ]
   ],
-  "poznamka": "Sklo dorazilo z kalírny 6. 11., rozměry sedí."
+  "poznamka": "Sklo dorazilo z kalírny 6. 11., rozměry sedí.",
+  "prilohy": [
+   {
+    "nazev": "Smlouva o dílo 2026-0042.pdf",
+    "stitek": "smlouva",
+    "velikost": 268400,
+    "druh": "pdf",
+    "kdy": "2026-11-03"
+   },
+   {
+    "nazev": "zamereni-schodiste.pdf",
+    "stitek": "zamereni",
+    "velikost": 1842000,
+    "druh": "pdf",
+    "kdy": "2026-11-02"
+   },
+   {
+    "nazev": "navrh-zabradli-v2.pdf",
+    "stitek": "navrh",
+    "velikost": 3410000,
+    "druh": "pdf",
+    "kdy": "2026-11-04"
+   },
+   {
+    "nazev": "IMG_8841.jpg",
+    "stitek": "foto",
+    "velikost": 2640000,
+    "druh": "obrazek",
+    "kdy": "2026-11-02"
+   },
+   {
+    "nazev": "atest-kaleneho-skla.pdf",
+    "stitek": "atest",
+    "velikost": 412000,
+    "druh": "pdf",
+    "kdy": "2026-11-08"
+   }
+  ]
  },
  {
   "id": "Z-2026-0030",
@@ -71,7 +108,30 @@
     false
    ]
   ],
-  "poznamka": "Profily přislíbeny na 12. 11."
+  "poznamka": "Profily přislíbeny na 12. 11.",
+  "prilohy": [
+   {
+    "nazev": "zamereni-pergola.pdf",
+    "stitek": "zamereni",
+    "velikost": 1120000,
+    "druh": "pdf",
+    "kdy": "2026-10-27"
+   },
+   {
+    "nazev": "navrh-zaskleni.pdf",
+    "stitek": "navrh",
+    "velikost": 2980000,
+    "druh": "pdf",
+    "kdy": "2026-10-28"
+   },
+   {
+    "nazev": "objednavka-profilu.pdf",
+    "stitek": "smlouva",
+    "velikost": 184000,
+    "druh": "pdf",
+    "kdy": "2026-10-29"
+   }
+  ]
  },
  {
   "id": "Z-2026-0029",
@@ -108,7 +168,44 @@
     true
    ]
   ],
-  "poznamka": "Předáno bez výhrad."
+  "poznamka": "Předáno bez výhrad.",
+  "prilohy": [
+   {
+    "nazev": "Smlouva o dílo 2026-0036.pdf",
+    "stitek": "smlouva",
+    "velikost": 254000,
+    "druh": "pdf",
+    "kdy": "2026-10-15"
+   },
+   {
+    "nazev": "zamereni-obyvak.pdf",
+    "stitek": "zamereni",
+    "velikost": 960000,
+    "druh": "pdf",
+    "kdy": "2026-10-14"
+   },
+   {
+    "nazev": "foto-po-montazi.jpg",
+    "stitek": "foto",
+    "velikost": 3180000,
+    "druh": "obrazek",
+    "kdy": "2026-10-26"
+   },
+   {
+    "nazev": "predavaci-protokol.pdf",
+    "stitek": "jine",
+    "velikost": 148000,
+    "druh": "pdf",
+    "kdy": "2026-10-27"
+   },
+   {
+    "nazev": "faktura-2026-0114.pdf",
+    "stitek": "faktura",
+    "velikost": 96000,
+    "druh": "pdf",
+    "kdy": "2026-10-27"
+   }
+  ]
  },
  {
   "id": "Z-2026-0028",
@@ -135,6 +232,29 @@
     true
    ]
   ],
-  "poznamka": "Odebráno osobně, platba hotově."
+  "poznamka": "Odebráno osobně, platba hotově.",
+  "prilohy": [
+   {
+    "nazev": "objednavka-velkoobchod.pdf",
+    "stitek": "smlouva",
+    "velikost": 112000,
+    "druh": "pdf",
+    "kdy": "2026-10-01"
+   },
+   {
+    "nazev": "rozmery-tabule.xlsx",
+    "stitek": "zamereni",
+    "velikost": 38400,
+    "druh": "tabulka",
+    "kdy": "2026-10-01"
+   },
+   {
+    "nazev": "faktura-2026-0113.pdf",
+    "stitek": "faktura",
+    "velikost": 92000,
+    "druh": "pdf",
+    "kdy": "2026-10-07"
+   }
+  ]
  }
 ]

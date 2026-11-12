@@ -1202,6 +1202,174 @@ button.postup__znak:focus-visible { outline: 2px solid var(--zlata-sytá); outli
   .akce-radku select { flex: 1 1 100%; }
 }
 
+/* ------------------------------------------------------------- přílohy */
+
+.spinatko {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--text-slabý);
+  font-size: 0.8125rem;
+}
+
+.spinatko svg { width: 1rem; height: 1rem; }
+
+.stitky-souhrn {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-left: 0.625rem;
+  vertical-align: middle;
+}
+
+.stitek-pocet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stitek-pocet [data-cislo] {
+  font-size: 0.75rem;
+  color: var(--text-slabý);
+  font-variant-numeric: tabular-nums;
+}
+
+.prilohy__seznam {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.prilohy__seznam li {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto auto;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.4375rem 0.5rem;
+  border: 1px solid var(--okraj);
+  border-radius: 0.5rem;
+  background: var(--plocha);
+}
+
+.prilohy__seznam li:hover { background: var(--plocha-2); }
+
+.priloha__znak {
+  display: inline-flex;
+  color: var(--text-slabý);
+}
+
+.priloha__znak svg { width: 1.125rem; height: 1.125rem; }
+
+.priloha__nazev {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.priloha__meta {
+  font-size: 0.8125rem;
+  color: var(--text-slabý);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.stitek-volba {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1875rem 1.5rem 0.1875rem 0.5rem;
+  border: 1px solid var(--okraj);
+  border-radius: 999px;
+  background: var(--plocha-2);
+  color: var(--text);
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 0.75rem) 55%, calc(100% - 0.5rem) 55%;
+  background-size: 0.25rem 0.25rem, 0.25rem 0.25rem;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+li[data-stitek="smlouva"] .stitek-volba,
+li[data-stitek="faktura"] .stitek-volba {
+  background-color: #e7f0fa;
+  border-color: #c3d9ef;
+  color: #1c4f82;
+}
+
+li[data-stitek="zamereni"] .stitek-volba,
+li[data-stitek="navrh"] .stitek-volba {
+  background-color: #fbf1dd;
+  border-color: #ecd9ad;
+  color: #7a5713;
+}
+
+li[data-stitek="foto"] .stitek-volba {
+  background-color: #e3f1e6;
+  border-color: #bcdcc4;
+  color: #1f5d33;
+}
+
+.priloha__tl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  background: none;
+  color: var(--text-slabý);
+  cursor: pointer;
+}
+
+.priloha__tl svg { width: 1rem; height: 1rem; }
+.priloha__tl:hover { background: var(--plocha-3); color: var(--text); }
+.priloha__tl--pryc:hover { background: #fdeceb; color: var(--chyba); border-color: #f2c6c2; }
+
+.prilohy__prazdno {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-slabý);
+}
+
+.nahraj--priloha {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  margin-top: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px dashed var(--okraj-silný);
+  border-radius: 0.5rem;
+  background: var(--plocha-2);
+}
+
+.nahraj--priloha[data-nad] {
+  border-color: var(--zlatá, #b8892b);
+  background: #fbf6ec;
+}
+
+.nahraj--priloha .nahraj__text {
+  font-size: 0.8125rem;
+  color: var(--text-slabý);
+}
+
+@media (max-width: 40rem) {
+  .prilohy__seznam li {
+    grid-template-columns: auto 1fr auto auto;
+    row-gap: 0.25rem;
+  }
+
+  .priloha__nazev { grid-column: 2 / -1; }
+  .priloha__meta { grid-column: 2 / 3; }
+  .stitek-volba { grid-column: 3 / 4; }
+}
+
 @media print {
   :root { --pozadí: #fff; }
 
@@ -1228,6 +1396,10 @@ button.postup__znak:focus-visible { outline: 2px solid var(--zlata-sytá); outli
   .tabulka tbody tr { page-break-inside: avoid; }
 
   .tisk-jen { display: block !important; }
+
+  .nahraj--priloha, .prilohy__prazdno { display: none !important; }
+  .prilohy__seznam li { border: 0; border-bottom: 1px solid #ddd; border-radius: 0; padding: 0.25rem 0; }
+  .stitek-tisk { font-weight: 600; }
   .akce-radku, .uprava, .potvrzeni, .filtry { display: none !important; }
 
   /* na stránce s dokumentem se tiskne jen dokument, ne nadpis obrazovky */
