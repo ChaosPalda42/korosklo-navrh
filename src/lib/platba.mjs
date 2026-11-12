@@ -118,7 +118,7 @@ export function csvProUcetni(faktury, volby = {}) {
       const pole = [
         f.cislo ?? "",
         variabilniSymbol(f.cislo),
-        f.stav === "navrh" ? "" : klienti[f.klient] ?? f.klient ?? "",
+        klienti[f.klient] ?? f.klient ?? "",
         f.popis ?? "",
         datumBezMezer(f.vystaveno),
         datumBezMezer(f.splatnost),
