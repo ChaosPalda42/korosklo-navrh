@@ -818,7 +818,7 @@ select {
 .prihlaseni__pata { margin-top: 1.5rem; font-size: 0.8125rem; color: var(--text-slabý); }
 
 /* ------------------------------------------------------- rozkládací řádky */
-.rozbal { border-bottom: 1px solid var(--okraj-vnitřní); }
+.rozbal { border-bottom: 1px solid var(--okraj-vnitřní); scroll-margin-top: 4.5rem; }
 .rozbal:last-child { border-bottom: 0; }
 
 .rozbal > summary {
@@ -966,6 +966,50 @@ select {
 .platnost--prosla { background: var(--chyba-plocha); color: #8d211b; }
 .platnost svg { width: 1.125rem; height: 1.125rem; flex: none; }
 .platnost strong { font-weight: 600; }
+
+/* ---------------------------------------------- souvislosti mezi doklady */
+.souvislosti {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+
+.souvislosti__kus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3125rem 0.625rem;
+  border: 1px solid var(--okraj);
+  border-radius: 999px;
+  background: var(--plocha);
+  font-size: 0.8125rem;
+  color: var(--text);
+  text-decoration: none;
+  max-width: 100%;
+}
+
+a.souvislosti__kus:hover { border-color: var(--zlata-tmavá); background: var(--plocha-2); }
+
+.souvislosti__kus--tady {
+  background: var(--plocha-2);
+  border-style: dashed;
+  color: var(--text-tlumený);
+}
+
+.souvislosti__co {
+  color: var(--text-slabý);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.souvislosti__co-to { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.souvislosti svg { width: 0.9375rem; height: 0.9375rem; flex: none; color: var(--text-slabý); }
+
+/* řádek, na který se zrovna odskočilo z odkazu */
+.rozbal--naraz { box-shadow: inset 0 0 0 2px var(--zlata-tmavá); }
 
 /* ----------------------------------------------------------------- fotky */
 .fotky-mriz {

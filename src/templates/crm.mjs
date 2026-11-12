@@ -79,6 +79,48 @@ function odkazNaFakturu(stranka, faktura, dnes) {
     + odznakZeSlovniku(STAVY_FAKTUR, stavFaktury(faktura, dnes));
 }
 
+/** Zakázka, která vznikla z téhle nabídky. */
+function zakazkaNabidky(ctx, cisloNabidky) {
+  if (!cisloNabidky) return null;
+  return ctx.demo.zakazky.find((z) => z.nabidka === cisloNabidky) ?? null;
+}
+
+/** Faktura, která vznikla z téhle nabídky. */
+function fakturaNabidky(ctx, cisloNabidky) {
+  if (!cisloNabidky) return null;
+  return ctx.demo.faktury.find((f) => f.zNabidky === cisloNabidky) ?? null;
+}
+
+/** Pás „co k čemu patří" — zakázka, nabídka, faktura jedné věci pohromadě.
+ *  `tady` je ta, na které zrovna stojíme; z té se odkaz nedělá. */
+function pasSouvislosti(ctx, { zakazka, nabidka, faktura, tady }) {
+  const { stranka } = ctx;
+  const kusy = [];
+  if (zakazka) {
+    kusy.push(["zakazky", "Zakázka", `${zakazka.id} — ${zakazka.nazev}`,
+      `administrace/crm/zakazky.html#${zakazka.id}`, tady === "zakazka"]);
+  }
+  if (nabidka) {
+    kusy.push(["nabidky", "Nabídka", nabidka,
+      `administrace/crm/nabidka-${nabidka}.html`, tady === "nabidka"]);
+  }
+  if (faktura) {
+    kusy.push(["faktury", "Faktura", faktura,
+      `administrace/crm/faktura-${faktura}.html`, tady === "faktura"]);
+  }
+  if (kusy.length < 2) return "";
+  return `<nav class="souvislosti netisknout" aria-label="Kam to patří">`
+    + kusy.map(([ik, co, text, kam, jeTady]) => {
+      const vnitrek = ikona(ik) + `<span class="souvislosti__co">${h(co)}</span>`
+        + `<span class="souvislosti__co-to">${h(text)}</span>`;
+      return jeTady
+        ? `<span class="souvislosti__kus souvislosti__kus--tady" aria-current="page">`
+          + `${vnitrek}</span>`
+        : `<a class="souvislosti__kus" href="${odkaz(stranka, kam)}">${vnitrek}</a>`;
+    }).join("")
+    + `</nav>`;
+}
+
 function odznakZeSlovniku(slovnik, stav) {
   const [nazev, barva] = slovnik[stav] ?? [stav, ""];
   return odznak(nazev, barva);
@@ -255,6 +297,7 @@ export function nabidky(ctx) {
   const radky = demo.nabidky.map((n) => {
     const k = klient(ctx, n.klient);
     const s = souhrn(n);
+    const z = zakazkaNabidky(ctx, n.cislo);
     const cesta = odkaz(stranka, `administrace/crm/nabidka-${n.cislo}.html`);
     return {
       atributy: `data-stav="${h(n.stav)}" data-text="${h([n.cislo, k?.jmeno, n.nazev].join(" ").toLowerCase())}"`,
@@ -262,7 +305,11 @@ export function nabidky(ctx) {
         `<a class="tabulka__hlavni" href="${cesta}">${h(n.cislo)}</a>`
         + `<span class="tabulka__pod">${h(datumKratce(n.vystaveno))}</span>`,
         `<span class="tabulka__hlavni">${h(k?.jmeno ?? "—")}</span>`
-        + `<span class="tabulka__pod">${h(n.nazev)}</span>`,
+        + `<span class="tabulka__pod">${h(n.nazev)}</span>`
+        + (z
+          ? `<span class="tabulka__pod"><a href="${odkaz(stranka,
+            `administrace/crm/zakazky.html#${z.id}`)}">zakázka ${h(z.id)}</a></span>`
+          : ""),
         odznakZeSlovniku(STAVY_NABIDEK, n.stav),
         n.stav === "odeslana" ? odznakPlatnosti(n, dnes)
           : `<span class="tabulka__pod">do ${h(datumKratce(n.platnostDo))}</span>`,
@@ -314,8 +361,10 @@ export function nabidky(ctx) {
 
 /** Jedna nabídka — dokument s živým přepočtem a tiskem. */
 export function nabidkaDetail(ctx, n) {
-  const { site, stranka, dnes } = ctx;
+  const { stranka, dnes } = ctx;
   const k = klient(ctx, n.klient);
+  const zakazkaN = zakazkaNabidky(ctx, n.cislo);
+  const fakturaN = fakturaNabidky(ctx, n.cislo);
   const s = souhrn(n);
   const stav = stavPlatnosti(n, dnes);
   const dnu = dnuMezi(dnes, n.platnostDo);
@@ -410,10 +459,24 @@ export function nabidkaDetail(ctx, n) {
       ? `<a class="tl" href="mailto:${h(k.email)}?subject=${encodeURIComponent(`Cenová nabídka ${n.cislo} — KORO-SKLO`)}">`
         + `${ikona("obalka")} Odeslat e-mailem</a>`
       : "")
-    + `<a class="tl" href="${odkaz(stranka, "administrace/crm/zakazky.html")}">${ikona("zakazky")} Udělat zakázku</a>`
-    + `<a class="tl" href="${odkaz(stranka, "administrace/crm/faktury.html")}">${ikona("faktury")} Vytvořit fakturu</a>`;
+    + (zakazkaN
+      ? `<a class="tl" href="${odkaz(stranka, `administrace/crm/zakazky.html#${zakazkaN.id}`)}">`
+        + `${ikona("zakazky")} Zakázka ${h(zakazkaN.id)}</a>`
+      : `<a class="tl" href="${odkaz(stranka, "administrace/crm/zakazky.html")}">`
+        + `${ikona("zakazky")} Udělat zakázku</a>`)
+    + (fakturaN
+      ? `<a class="tl" href="${odkaz(stranka, `administrace/crm/faktura-${fakturaN.cislo}.html`)}">`
+        + `${ikona("faktury")} Faktura ${h(fakturaN.cislo)}</a>`
+      : `<a class="tl" href="${odkaz(stranka, "administrace/crm/faktury.html")}">`
+        + `${ikona("faktury")} Vytvořit fakturu</a>`);
 
-  const telo = `<div class="platnost platnost--${stav} netisknout">`
+  const telo = pasSouvislosti(ctx, {
+    zakazka: zakazkaN,
+    nabidka: n.cislo,
+    faktura: fakturaN?.cislo,
+    tady: "nabidka",
+  })
+    + `<div class="platnost platnost--${stav} netisknout">`
     + ikona(stav === "prosla" ? "pozor" : "hodiny")
     + `<span>${hlaskaPlatnosti}</span></div>`
     + dokument
@@ -595,6 +658,7 @@ function zakazkaRadek(ctx, z) {
     telo,
     otevreno: jeVBehu(z),
     atributy: {
+      id: z.id,
       "data-zakazka": z.id,
       "data-stav": z.stav,
       "data-text": proHledani,
@@ -974,7 +1038,13 @@ export function fakturaDetail(ctx, f) {
         + `${ikona("nabidky")} Nabídka ${h(f.zNabidky)}</a>`
       : "");
 
-  const telo = `<div class="platnost platnost--${tridaPruhu} netisknout" data-pruh>`
+  const telo = pasSouvislosti(ctx, {
+    zakazka: zakazkaNabidky(ctx, f.zNabidky),
+    nabidka: f.zNabidky,
+    faktura: f.cislo,
+    tady: "faktura",
+  })
+    + `<div class="platnost platnost--${tridaPruhu} netisknout" data-pruh>`
     + ikona(ikonaPruhu)
     + `<span data-pruh-text>${textPruhu}</span></div>`
     + dokument

@@ -785,6 +785,28 @@ function fakturujZakazku(radek) {
     + " — položky se vzaly z nabídky. V ostré verzi by se rovnou otevřela k vystavení.");
 }
 
+/** Proklik na jednu zakázku (zakazky.html#Z-2026-0028) — třeba z nabídky
+ *  nebo z faktury. Když ji filtr schovává, přepne se na Všechny, řádek se
+ *  rozbalí a stránka na něj odskočí. */
+function zakazkaZOdkazu(obal) {
+  const ukaz = () => {
+    const id = decodeURIComponent((window.location.hash || "").slice(1));
+    if (!id || /["\\]/.test(id)) return;
+    const radek = obal.querySelector(`[data-zakazka="${id}"]`);
+    if (!radek) return;
+    if (radek.hidden) {
+      const vse = document.querySelector('[data-filtr-z] [data-hodnota=""]');
+      if (vse) vse.click();
+    }
+    radek.open = true;
+    radek.scrollIntoView({ block: "start", behavior: "smooth" });
+    radek.classList.add("rozbal--naraz");
+    window.setTimeout(() => radek.classList.remove("rozbal--naraz"), 2500);
+  };
+  ukaz();
+  window.addEventListener("hashchange", ukaz);
+}
+
 function zakazky() {
   const obal = document.querySelector("#seznam-zakazek");
   if (!obal) return;
@@ -792,6 +814,7 @@ function zakazky() {
   zakazkyAkce(obal);
   prilohyAkce(obal);
   prefiltrujZakazky(obal);
+  zakazkaZOdkazu(obal);
 
   for (const tl of document.querySelectorAll("[data-nova-zakazka]")) {
     tl.addEventListener("click", () => hlaska(

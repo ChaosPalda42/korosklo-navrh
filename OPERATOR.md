@@ -151,3 +151,24 @@ Zadání: *„Já bych chtěl mít možnost vytvořit tu fakturu přímo ze zak�
   stránka nese v `faktury-json`. Brána navíc hlídá, že žádné dvě faktury
   nevznikly z jedné nabídky a že každá zakázka míří na existující nabídku.
 - Ukázka nic neukládá — předávka to říká i o faktuře udělané ze zakázky.
+
+## 2026-11-12 — z nabídky i z faktury je vidět zakázka
+
+Zadání: *„Z faktury jsem se prokliknul na nabídku, ale už nevím, k jaké ta
+nabídka patří zakázce.. To tam někde musí být vidět a k prokliku.."*
+
+- Nahoře na nabídce i na faktuře je **pás souvislostí**: zakázka — nabídka —
+  faktura. Ta, na které stojíme, je bez odkazu; ostatní jsou proklik. Na tisku
+  se pás neobjeví.
+- Řádek zakázky dostal `id`, takže se na konkrétní zakázku dá odkázat
+  (`zakazky.html#Z-2026-0028`). Administrace proklik dotáhne: když zakázku
+  schovává filtr (hotové se standardně neukazují), přepne se na *Všechny*,
+  řádek rozbalí, odskočí na něj a na chvíli ho zvýrazní.
+- V seznamu nabídek je u nabídky vidět i číslo zakázky, která z ní vznikla.
+- Když z nabídky ještě nic nevzniklo, zůstávají v akcích původní tlačítka
+  *Udělat zakázku* a *Vytvořit fakturu*; jinak se z nich stanou odkazy na to,
+  co už existuje.
+- Brána `tests/test_prokliky.py` (28 testů) **staví web a čte hotové HTML**:
+  pro každou nabídku i fakturu kontroluje proti datům, že odkaz na zakázku
+  (a na doklad faktury) opravdu existuje, a že žádný nevede tam, kde nic není.
+  Ověřeno i naopak — bez té kotvy brána zčervená.
