@@ -6,8 +6,54 @@
   "vystaveno": "2026-11-10",
   "splatnost": "2026-11-24",
   "stav": "navrh",
-  "celkem": 68850,
-  "popis": "Zábradlí k dřevěnému schodišti — Sadová 12, Plzeň"
+  "celkem": 72479,
+  "popis": "Zábradlí k dřevěnému schodišti — Sadová 12, Plzeň",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "polozky": [
+   {
+    "nazev": "Kalené vrstvené sklo VSG 8.8.2 čiré, výroba na míru",
+    "mnozstvi": 10.4,
+    "jednotka": "m²",
+    "cena": 3180,
+    "dph": 21
+   },
+   {
+    "nazev": "Nerezové bodové terče AISI 304, broušené",
+    "mnozstvi": 14,
+    "jednotka": "ks",
+    "cena": 890,
+    "dph": 21
+   },
+   {
+    "nazev": "Výřezy a broušení hran",
+    "mnozstvi": 10.4,
+    "jednotka": "m²",
+    "cena": 420,
+    "dph": 21
+   },
+   {
+    "nazev": "Zaměření na místě",
+    "mnozstvi": 1,
+    "jednotka": "–",
+    "cena": 0,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž včetně kotvení do dřeva",
+    "mnozstvi": 14,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava Plzeň a okolí",
+    "mnozstvi": 2,
+    "jednotka": "cesta",
+    "cena": 450,
+    "dph": 21
+   }
+  ]
  },
  {
   "cislo": "2026-0114",
@@ -16,8 +62,47 @@
   "vystaveno": "2026-10-27",
   "splatnost": "2026-11-10",
   "stav": "vystavena",
-  "celkem": 25620,
-  "popis": "Posuvné dveře obývák–kuchyně"
+  "celkem": 25233,
+  "popis": "Posuvné dveře obývák–kuchyně",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "polozky": [
+   {
+    "nazev": "Kalené sklo ESG 8 mm, satináto",
+    "mnozstvi": 2.1,
+    "jednotka": "m²",
+    "cena": 3240,
+    "dph": 21
+   },
+   {
+    "nazev": "Posuvný systém na stěnu, černý",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 8900,
+    "dph": 21
+   },
+   {
+    "nazev": "Mušle a zarážky",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 1450,
+    "dph": 21
+   },
+   {
+    "nazev": "Montáž",
+    "mnozstvi": 5,
+    "jednotka": "h",
+    "cena": 650,
+    "dph": 21
+   },
+   {
+    "nazev": "Doprava",
+    "mnozstvi": 1,
+    "jednotka": "cesta",
+    "cena": 450,
+    "dph": 21
+   }
+  ]
  },
  {
   "cislo": "2026-0113",
@@ -26,9 +111,36 @@
   "vystaveno": "2026-10-07",
   "splatnost": "2026-10-21",
   "stav": "zaplacena",
-  "celkem": 10240,
+  "celkem": 10339,
   "popis": "Lakobel a zrcadla — velkoobchod",
-  "zaplaceno": "2026-10-09"
+  "zaplaceno": "2026-10-09",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "polozky": [
+   {
+    "nazev": "Lakobel RAL 9016, 6 mm, řez na míru",
+    "mnozstvi": 3.2,
+    "jednotka": "m²",
+    "cena": 1980,
+    "dph": 21,
+    "sleva": 12
+   },
+   {
+    "nazev": "Zrcadlo 4 mm, broušená hrana",
+    "mnozstvi": 1.8,
+    "jednotka": "m²",
+    "cena": 1420,
+    "dph": 21,
+    "sleva": 12
+   },
+   {
+    "nazev": "Vrtání otvorů pro zásuvky",
+    "mnozstvi": 4,
+    "jednotka": "ks",
+    "cena": 180,
+    "dph": 21
+   }
+  ]
  },
  {
   "cislo": "2026-0112",
@@ -37,8 +149,36 @@
   "vystaveno": "2026-11-03",
   "splatnost": "2026-12-03",
   "stav": "vystavena",
-  "celkem": 61500,
-  "popis": "Bytový dům Pod Strání — etapa I, doplatek"
+  "celkem": 73011,
+  "popis": "Bytový dům Pod Strání — etapa I, doplatek",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "polozky": [
+   {
+    "nazev": "Zábradlí na lodžie — kalené sklo 8 mm, čiré, 6 ks",
+    "mnozstvi": 6,
+    "jednotka": "ks",
+    "cena": 7450
+   },
+   {
+    "nazev": "Nerezové kotvení do betonu",
+    "mnozstvi": 24,
+    "jednotka": "ks",
+    "cena": 310
+   },
+   {
+    "nazev": "Montáž včetně lešení",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 6900
+   },
+   {
+    "nazev": "Doprava Plzeň a okolí",
+    "mnozstvi": 2,
+    "jednotka": "jízda",
+    "cena": 650
+   }
+  ]
  },
  {
   "cislo": "2026-0111",
@@ -47,8 +187,37 @@
   "vystaveno": "2026-10-18",
   "splatnost": "2026-11-01",
   "stav": "vystavena",
-  "celkem": 148300,
-  "popis": "Sprchové kouty hotel, etapa I"
+  "celkem": 192656,
+  "popis": "Sprchové kouty hotel, etapa I",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "polozky": [
+   {
+    "nazev": "Sprchová zástěna 90 × 200 cm, kalené sklo 8 mm, matné",
+    "mnozstvi": 14,
+    "jednotka": "ks",
+    "cena": 8200
+   },
+   {
+    "nazev": "Profily a dveřní kování, nerez",
+    "mnozstvi": 14,
+    "jednotka": "sada",
+    "cena": 1850
+   },
+   {
+    "nazev": "Montáž na místě",
+    "mnozstvi": 14,
+    "jednotka": "ks",
+    "cena": 1200,
+    "sleva": 10
+   },
+   {
+    "nazev": "Doprava a zaměření",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 3400
+   }
+  ]
  },
  {
   "cislo": "2026-0110",
@@ -57,8 +226,30 @@
   "vystaveno": "2026-10-12",
   "splatnost": "2026-11-11",
   "stav": "vystavena",
-  "celkem": 37400,
-  "popis": "Dělicí stěny kancelář Americká — dodávka bez montáže"
+  "celkem": 41455,
+  "popis": "Dělicí stěny kancelář Americká — dodávka bez montáže",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "polozky": [
+   {
+    "nazev": "Dělicí stěna — kalené sklo 10 mm, čiré, 2100 × 2600 mm",
+    "mnozstvi": 4,
+    "jednotka": "ks",
+    "cena": 6300
+   },
+   {
+    "nazev": "Podlahové profily, elox",
+    "mnozstvi": 11,
+    "jednotka": "m",
+    "cena": 540
+   },
+   {
+    "nazev": "Pískované pruhy podle návrhu",
+    "mnozstvi": 4,
+    "jednotka": "ks",
+    "cena": 780
+   }
+  ]
  },
  {
   "cislo": "2026-0109",
@@ -67,9 +258,31 @@
   "vystaveno": "2026-09-30",
   "splatnost": "2026-10-14",
   "stav": "zaplacena",
-  "celkem": 8900,
+  "celkem": 9499,
   "popis": "Zasklení vitríny",
-  "zaplaceno": "2026-10-12"
+  "zaplaceno": "2026-10-12",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "polozky": [
+   {
+    "nazev": "Zasklení vitríny — float 4 mm, broušené hrany",
+    "mnozstvi": 3,
+    "jednotka": "ks",
+    "cena": 1480
+   },
+   {
+    "nazev": "Police do vitríny, sklo 6 mm",
+    "mnozstvi": 4,
+    "jednotka": "ks",
+    "cena": 690
+   },
+   {
+    "nazev": "Doprava",
+    "mnozstvi": 1,
+    "jednotka": "jízda",
+    "cena": 650
+   }
+  ]
  },
  {
   "cislo": "2026-0108",
@@ -78,7 +291,35 @@
   "vystaveno": "2026-09-22",
   "splatnost": "2026-10-06",
   "stav": "zaplacena",
-  "celkem": 19700,
-  "popis": "Zrcadla do koupelny"
+  "celkem": 20207,
+  "popis": "Zrcadla do koupelny",
+  "platceDph": true,
+  "zaokrouhlit": true,
+  "polozky": [
+   {
+    "nazev": "Zrcadlo do koupelny s fazetou, 800 × 600 mm",
+    "mnozstvi": 2,
+    "jednotka": "ks",
+    "cena": 3250
+   },
+   {
+    "nazev": "Zrcadlo do předsíně, 1800 × 600 mm",
+    "mnozstvi": 1,
+    "jednotka": "ks",
+    "cena": 6400
+   },
+   {
+    "nazev": "Lepení na zeď, podložky a montáž",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 2900
+   },
+   {
+    "nazev": "Zaměření u zákazníka",
+    "mnozstvi": 1,
+    "jednotka": "kpl",
+    "cena": 900
+   }
+  ]
  }
 ]

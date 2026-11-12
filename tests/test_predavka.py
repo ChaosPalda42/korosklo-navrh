@@ -78,6 +78,12 @@ def test_pocty_v_predavce_odpovidaji_datum(text: str, jmeno: str) -> None:
     )
 
 
+def test_ucet_na_fakturach_je_z_dat(text: str) -> None:
+    """Číslo účtu v předávce musí být to, co jde na doklady."""
+    ucet = nacti("demo/platba.json")["ucet"]
+    assert ucet in text, f"předávka neuvádí číslo účtu z demo/platba.json ({ucet})"
+
+
 def test_udaje_firmy_jsou_z_dat(text: str) -> None:
     """IČ, DIČ a adresa v předávce musí být ty, co jdou na web."""
     site = nacti("site.json")
@@ -88,6 +94,40 @@ def test_udaje_firmy_jsou_z_dat(text: str) -> None:
         assert str(adresa[pole]) in text, (
             f"předávka neuvádí část adresy ze site.json ({pole})"
         )
+
+
+def test_celkem_na_fakturach_vychazi_z_polozek() -> None:
+    """Předávka tvrdí „částky, položky“ — ať částka opravdu z položek vyjde.
+
+    Nepočítá se tady znovu: sečte to `souhrn` z `src/lib/nabidka.mjs`, tedy
+    ten samý kód, který čísla sází na doklad.
+    """
+    from tests.jsmod import run_js
+
+    faktury = nacti("demo/faktury.json")
+    spocitane = run_js(
+        "nabidka.mjs",
+        "out(A.faktury.map((f) => m.souhrn(f).celkem));",
+        args={"faktury": faktury},
+    )
+    for f, celkem in zip(faktury, spocitane):
+        assert f["polozky"], f"faktura {f['cislo']} je bez položek"
+        assert f["celkem"] == celkem, (
+            f"faktura {f['cislo']}: v datech je celkem {f['celkem']}, "
+            f"ze položek vychází {celkem}"
+        )
+
+
+def test_kazda_faktura_ma_svuj_doklad(text: str) -> None:
+    """Předávka slibuje doklad k tisku u každé faktury — ať ho sestavení staví."""
+    assert "doklad" in text, "předávka o dokladu k tisku nemluví"
+    build = (ROOT / "build.mjs").read_text(encoding="utf8")
+    assert re.search(r"demo\.faktury\.map\(", build), (
+        "sestavení neprochází faktury — doklady by nevznikly"
+    )
+    assert "faktura-${f.cislo}.html" in build, (
+        "sestavení nestaví stránku dokladu faktura-<číslo>.html"
+    )
 
 
 def test_den_ukazky_souhlasi_s_sestavenim(text: str) -> None:

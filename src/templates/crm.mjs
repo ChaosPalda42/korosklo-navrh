@@ -10,6 +10,7 @@ import { cislo, koruny, sMnoznym, datum, datumKratce, pred, dnuMezi } from "../l
 import { polozkaCelkem, souhrn, stavPlatnosti } from "../lib/nabidka.mjs";
 import { stavKarty, podLimitem, hodnotaSkladu } from "../lib/sklad.mjs";
 import { stavFaktury, dnuPoSplatnosti, prehled, variabilniSymbol } from "../lib/faktura.mjs";
+import { iban } from "../lib/platba.mjs";
 import { postup, pocty, serad, jeVBehu } from "../lib/zakazky.mjs";
 import { STITKY, serad as seradPrilohy, pocty as poctyPriloh, velikost }
   from "../lib/prilohy.mjs";
@@ -88,6 +89,15 @@ function adresaKlienta(k) {
   if (k.mesto) radky.push(`${h(k.psc)} ${h(k.mesto)}`);
   if (k.ico) radky.push(`IČ ${h(k.ico)}${k.dic ? ` · DIČ ${h(k.dic)}` : ""}`);
   return radky.join("<br>");
+}
+
+/** Hlavička dokladu — kdo ho vystavil. Údaje firmy jsou skutečné. */
+function znackaDodavatele(ctx) {
+  const { site, stranka } = ctx;
+  const a = site.adresa ?? {};
+  return `<img src="${odkaz(stranka, "assets/img/logo.svg")}" width="1049" height="348" alt="${h(site.znacka)}">
+      ${h(site.firma)}<br>${h(a.ulice)}<br>${h(a.psc)} ${h(a.mesto)}<br>
+      IČ ${h(site.ic)} · DIČ ${h(site.dic)}`;
 }
 
 /* --------------------------------------------------------- přehled (CRM) */
@@ -330,11 +340,7 @@ export function nabidkaDetail(ctx, n) {
       <h2>${h(n.cislo)} — ${h(n.nazev)}</h2>
       <p style="color:var(--text-tlumený);margin-top:0.25rem">Vystaveno ${h(datum(n.vystaveno))}</p>
     </div>
-    <div class="dokument__znacka">
-      <img src="${odkaz(stranka, "assets/img/logo.svg")}" width="1049" height="348" alt="${h(site.znacka)}">
-      ${h(site.firma)}<br>${h(site.ulice)}<br>${h(site.psc)} ${h(site.mesto)}<br>
-      IČ ${h(site.ico)} · DIČ ${h(site.dic)}
-    </div>
+    <div class="dokument__znacka">${znackaDodavatele(ctx)}</div>
   </header>
 
   <div class="dokument__strany">
@@ -792,6 +798,166 @@ export function sklad(ctx) {
   };
 }
 
+/* ------------------------------------------------------- detail faktury */
+
+/** Pruh nad dokladem: co je s fakturou teď a co s ní udělat. */
+function pruhFaktury(f, dnes) {
+  const stav = stavFaktury(f, dnes);
+  if (stav === "zaplacena") {
+    return ["plati", "hodiny",
+      `Zaplaceno <strong>${h(datum(f.zaplaceno))}</strong>`
+      + (f.splatnost ? ` — splatnost byla ${h(datum(f.splatnost))}.` : ".")];
+  }
+  if (stav === "po-splatnosti") {
+    const d = dnuPoSplatnosti(f, dnes);
+    return ["prosla", "pozor",
+      `Po splatnosti o <strong>${sMnoznym(d, ["den", "dny", "dní"])}</strong>`
+      + ` — splatnost byla ${h(datum(f.splatnost))}. Na tuhle zavolat.`];
+  }
+  if (stav === "navrh") {
+    return ["konci", "hodiny",
+      "Návrh — faktura ještě není vystavená. Dokud ji nevystavíte, dá se do ní sahat."];
+  }
+  const d = dnuMezi(dnes, f.splatnost);
+  return ["plati", "hodiny",
+    `Splatnost <strong>${h(datum(f.splatnost))}</strong>`
+    + (d === 0 ? " — dnes je poslední den." : ` — ještě ${sMnoznym(d, ["den", "dny", "dní"])}.`)];
+}
+
+export function fakturaDetail(ctx, f) {
+  const { demo, stranka, dnes } = ctx;
+  const k = klient(ctx, f.klient);
+  const s = souhrn(f);
+  const stav = stavFaktury(f, dnes);
+  const platba = demo.platba;
+  const vs = variabilniSymbol(f.cislo);
+  const [tridaPruhu, ikonaPruhu, textPruhu] = pruhFaktury(f, dnes);
+
+  const radkyPolozek = f.polozky.map((p) => `<tr>
+  <td>${h(p.nazev)}</td>
+  <td class="cisla">${h(cislo(p.mnozstvi, p.mnozstvi % 1 ? 2 : 0))}</td>
+  <td class="uzke">${h(p.jednotka)}</td>
+  <td class="cisla">${koruny(p.cena)}</td>
+  <td class="cisla">${p.sleva ? `${h(cislo(p.sleva, 0))} %` : "—"}</td>
+  <td class="cisla">${p.dph ?? 21} %</td>
+  <td class="cisla"><strong>${koruny(polozkaCelkem(p))}</strong></td>
+</tr>`).join("");
+
+  const souhrnCeny = `<div class="souhrn-ceny">
+  <div><span>Celkem bez DPH</span><span>${koruny(s.bezDph)}</span></div>
+  ${s.dph.map((d) => `<div><span>DPH ${d.sazba} % ze ${koruny(d.zaklad)}</span>`
+    + `<span>${koruny(d.dan, true)}</span></div>`).join("")}
+  ${s.zaokrouhleni ? `<div><span>Zaokrouhlení</span><span>${koruny(s.zaokrouhleni, true)}</span></div>` : ""}
+  <div class="souhrn-ceny__celkem"><span>Celkem k zaplacení</span><span>${koruny(s.celkem)}</span></div>
+</div>`;
+
+  const dokument = `<div class="dokument" data-faktura="${h(f.cislo)}"
+  data-stav="${h(stav)}" data-vlastni-stav="${h(f.stav)}" data-celkem="${s.celkem}"
+  data-klient="${h(k?.jmeno ?? "")}" data-popis="${h(f.popis ?? "")}"
+  data-vystaveno="${h(f.vystaveno ?? "")}" data-splatnost="${h(f.splatnost ?? "")}"
+  data-zaplaceno="${h(f.zaplaceno ?? "")}">
+  <header class="dokument__hlava">
+    <div>
+      <p class="ryska">Faktura — daňový doklad</p>
+      <h2>${h(f.cislo)}</h2>
+      <p style="color:var(--text-tlumený);margin-top:0.25rem">Vystaveno
+        <span data-vystaveno-text data-dlouhe>${f.vystaveno ? h(datum(f.vystaveno)) : "—"}</span></p>
+    </div>
+    <div class="dokument__znacka">${znackaDodavatele(ctx)}</div>
+  </header>
+
+  <div class="dokument__strany">
+    <div>
+      <h3>Odběratel</h3>
+      <p>${adresaKlienta(k)}</p>
+      ${k?.email ? `<p style="color:var(--text-tlumený)">${h(k.email)}${k.telefon ? ` · ${h(k.telefon)}` : ""}</p>` : ""}
+    </div>
+    <div>
+      <h3>Platební údaje</h3>
+      <p><strong>${h(platba.ucet)}</strong></p>
+      <p style="color:var(--text-tlumený)">${h(platba.banka)}<br>
+        IBAN ${h(iban(platba.ucet, { mezery: true }))}</p>
+      <p style="margin-top:0.375rem">Variabilní symbol <strong>${h(vs)}</strong></p>
+    </div>
+    <div>
+      <h3>Splatnost</h3>
+      <p><strong data-splatnost-text data-dlouhe>${f.splatnost ? h(datum(f.splatnost)) : "—"}</strong></p>
+      <p style="color:var(--text-tlumený)">${h(platba.forma)}${
+        f.zNabidky ? `<br>Z nabídky ${h(f.zNabidky)}` : ""}</p>
+    </div>
+  </div>
+
+  <div class="tabulka-obal">
+    <table class="tabulka">
+      <thead><tr>
+        <th>Položka</th><th class="cisla">Množství</th><th>Jedn.</th>
+        <th class="cisla">Cena / jedn.</th><th class="cisla">Sleva</th>
+        <th class="cisla">DPH</th><th class="cisla">Celkem</th>
+      </tr></thead>
+      <tbody>${radkyPolozek}</tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:1.5rem">${souhrnCeny}</div>
+
+  <div class="k-zaplaceni" data-k-zaplaceni>
+    <div>
+      <p class="ryska">K zaplacení</p>
+      <p class="k-zaplaceni__castka">${koruny(s.celkem)}</p>
+    </div>
+    <dl class="k-zaplaceni__udaje">
+      <div><dt>Účet</dt><dd>${h(platba.ucet)}</dd></div>
+      <div><dt>Variabilní symbol</dt><dd>${h(vs)}</dd></div>
+      <div><dt>Splatnost</dt><dd><span data-splatnost-text data-dlouhe>${f.splatnost ? h(datum(f.splatnost)) : "—"}</span></dd></div>
+    </dl>
+  </div>
+
+  ${f.popis ? `<p style="margin-top:1.5rem;color:var(--text-tlumený)">${h(f.popis)}</p>` : ""}
+
+  <p class="tisk-jen" style="margin-top:2rem;font-size:9pt;color:#555">
+    Faktura je daňový doklad. Nejsme plátci ani příjemci záloh nad rámec uvedených položek.
+    Při platbě uveďte variabilní symbol ${h(vs)}.
+  </p>
+</div>`;
+
+  const akce = `<button class="tl tl--hlavni" type="button" data-tisk>${ikona("tisk")} Tisk nebo PDF</button>`
+    + `<button class="tl" type="button" data-tl-vystavit`
+    + `${f.stav === "navrh" ? "" : " hidden"}>${ikona("faktury")} Vystavit fakturu</button>`
+    + `<button class="tl" type="button" data-tl-zaplaceno`
+    + `${f.stav === "navrh" || f.stav === "zaplacena" ? " hidden" : ""}>`
+    + `${ikona("fajfka")} Označit jako zaplacenou</button>`
+    + (k?.email
+      ? `<a class="tl" href="mailto:${h(k.email)}?subject=${encodeURIComponent(`Faktura ${f.cislo} — KORO-SKLO`)}">`
+        + `${ikona("obalka")} Odeslat e-mailem</a>`
+      : "")
+    + (f.zNabidky
+      ? `<a class="tl" href="${odkaz(stranka, `administrace/crm/nabidka-${f.zNabidky}.html`)}">`
+        + `${ikona("nabidky")} Nabídka ${h(f.zNabidky)}</a>`
+      : "");
+
+  const telo = `<div class="platnost platnost--${tridaPruhu} netisknout" data-pruh>`
+    + ikona(ikonaPruhu)
+    + `<span data-pruh-text>${textPruhu}</span></div>`
+    + dokument
+    + poznamka("Položky se berou z přijaté nabídky, takže se nepřepisují podruhé. "
+      + "Variabilní symbol a IBAN se počítají z čísla faktury a z čísla účtu. "
+      + "Tady jde o ukázku — v ostré verzi se faktura uloží a zůstane dohledatelná.",
+      { tisknout: false });
+
+  return {
+    titulek: `Faktura ${f.cislo}`,
+    nadpis: `Faktura ${f.cislo}`,
+    perex: k ? `${k.jmeno} — ${f.popis}` : f.popis,
+    cesta: [{ nazev: "Administrace", kam: "administrace/nastenka.html" },
+      { nazev: "CRM", kam: "administrace/crm/index.html" },
+      { nazev: "Faktury", kam: "administrace/crm/faktury.html" },
+      { nazev: f.cislo }],
+    faze: FAZE,
+    akce,
+    telo,
+  };
+}
+
 /* ---------------------------------------------------------------- faktury */
 
 export function faktury(ctx) {
@@ -802,32 +968,51 @@ export function faktury(ctx) {
     const k = klient(ctx, f.klient);
     const stav = stavFaktury(f, dnes);
     const poSplatnosti = dnuPoSplatnosti(f, dnes);
+    const detail = odkaz(stranka, `administrace/crm/faktura-${f.cislo}.html`);
     return {
-      atributy: `data-stav="${h(stav)}" data-text="${h([f.cislo, k?.jmeno, f.popis].join(" ").toLowerCase())}"`,
+      atributy: `data-stav="${h(stav)}" data-faktura="${h(f.cislo)}"`
+        + ` data-klient="${h(k?.jmeno ?? "")}" data-popis="${h(f.popis ?? "")}"`
+        + ` data-celkem="${f.celkem}" data-vystaveno="${h(f.vystaveno ?? "")}"`
+        + ` data-splatnost="${h(f.splatnost ?? "")}" data-zaplaceno="${h(f.zaplaceno ?? "")}"`
+        + ` data-vlastni-stav="${h(f.stav)}"`
+        + ` data-text="${h([f.cislo, k?.jmeno, f.popis].join(" ").toLowerCase())}"`,
       bunky: [
-        `<span class="tabulka__hlavni">${h(f.cislo)}</span>`
+        `<a class="tabulka__hlavni" href="${detail}">${h(f.cislo)}</a>`
         + `<span class="tabulka__pod">VS ${h(variabilniSymbol(f.cislo))}</span>`,
         `<span class="tabulka__hlavni">${h(k?.jmeno ?? "—")}</span>`
         + `<span class="tabulka__pod">${h(f.popis)}</span>`,
         f.zNabidky
           ? `<a href="${odkaz(stranka, `administrace/crm/nabidka-${f.zNabidky}.html`)}">${h(f.zNabidky)}</a>`
           : `<span style="color:var(--text-slabý)">—</span>`,
-        `${h(datumKratce(f.vystaveno))}`,
-        `${h(datumKratce(f.splatnost))}`
-        + (poSplatnosti ? `<span class="tabulka__pod" style="color:var(--chyba)">`
-          + `+${sMnoznym(poSplatnosti, ["den", "dny", "dní"])}</span>` : ""),
-        odznakZeSlovniku(STAVY_FAKTUR, stav),
+        `<span data-vystaveno-text>${h(datumKratce(f.vystaveno))}</span>`,
+        `<span data-splatnost-text>${h(datumKratce(f.splatnost))}</span>`
+        + `<span class="tabulka__pod" data-po-splatnosti${poSplatnosti ? "" : " hidden"}>`
+        + (poSplatnosti ? `+${sMnoznym(poSplatnosti, ["den", "dny", "dní"])}` : "") + `</span>`,
+        `<span data-odznak>${odznakZeSlovniku(STAVY_FAKTUR, stav)}</span>`,
         `<strong>${koruny(f.celkem)}</strong>`,
+        `<span class="radek-akce netisknout">`
+        + `<button class="tl tl--tichy tl--maly" type="button" data-tl-vystavit`
+        + `${f.stav === "navrh" ? "" : " hidden"}`
+        + ` title="Vystavit fakturu">${ikona("faktury")}`
+        + `<span class="jen-pro-cteni">Vystavit</span></button>`
+        + `<button class="tl tl--tichy tl--maly" type="button" data-tl-zaplaceno`
+        + `${f.stav === "navrh" || f.stav === "zaplacena" ? " hidden" : ""}`
+        + ` title="Označit jako zaplacenou">${ikona("fajfka")}`
+        + `<span class="jen-pro-cteni">Zaplaceno</span></button>`
+        + `<a class="tl tl--tichy tl--maly" href="${detail}" title="Otevřít fakturu">`
+        + `${ikona("sipka")}<span class="jen-pro-cteni">Otevřít</span></a>`
+        + `</span>`,
       ],
     };
   });
 
-  const telo = `<div class="mriz mriz--3">`
-    + dlazdice("Zaplaceno", koruny(p.zaplaceno), `${sMnoznym(p.pocty.zaplacena, ["faktura", "faktury", "faktur"])}`)
-    + dlazdice("Nezaplaceno", koruny(p.nezaplaceno),
-      `${sMnoznym(p.pocty.vystavena + p.pocty["po-splatnosti"], ["faktura", "faktury", "faktur"])} vystavených`)
-    + dlazdice("Po splatnosti", koruny(p.poSplatnosti),
-      `${sMnoznym(p.pocty["po-splatnosti"], ["faktura", "faktury", "faktur"])} — na tyhle zavolat`)
+  const telo = `<div class="mriz mriz--3" data-prehled>`
+    + dlazdice("Zaplaceno", `<span data-sucet="zaplaceno">${koruny(p.zaplaceno)}</span>`,
+      `<span data-pocet="zaplacena">${sMnoznym(p.pocty.zaplacena, ["faktura", "faktury", "faktur"])}</span>`)
+    + dlazdice("Nezaplaceno", `<span data-sucet="nezaplaceno">${koruny(p.nezaplaceno)}</span>`,
+      `<span data-pocet="nezaplacene">${sMnoznym(p.pocty.vystavena + p.pocty["po-splatnosti"], ["faktura", "faktury", "faktur"])}</span> vystavených`)
+    + dlazdice("Po splatnosti", `<span data-sucet="poSplatnosti">${koruny(p.poSplatnosti)}</span>`,
+      `<span data-pocet="po-splatnosti">${sMnoznym(p.pocty["po-splatnosti"], ["faktura", "faktury", "faktur"])}</span> — na tyhle zavolat`)
     + `</div>`
     + `<div class="filtry netisknout">`
     + `<label class="jen-pro-cteni" for="hledat-f">Hledat fakturu</label>`
@@ -837,7 +1022,9 @@ export function faktury(ctx) {
     + `<button class="volba" type="button" data-hodnota="po-splatnosti" aria-pressed="false">Po splatnosti</button>`
     + `<button class="volba" type="button" data-hodnota="vystavena" aria-pressed="false">Vystavené</button>`
     + `<button class="volba" type="button" data-hodnota="zaplacena" aria-pressed="false">Zaplacené</button>`
-    + `</div></div>`
+    + `</div>`
+    + `<button class="tl tl--maly" type="button" data-export-ucetni>${ikona("stahnout")} Export pro účetní</button>`
+    + `</div>`
     + karta({
       nadpis: `Faktury (${demo.faktury.length})`,
       telo: `<div id="seznam-faktur">`
@@ -845,17 +1032,18 @@ export function faktury(ctx) {
           sloupce: [{ nazev: "Číslo", trida: "uzke" }, { nazev: "Klient a co to bylo" },
             { nazev: "Z nabídky", trida: "uzke" }, { nazev: "Vystaveno", trida: "uzke" },
             { nazev: "Splatnost", trida: "uzke" }, { nazev: "Stav", trida: "uzke" },
-            { nazev: "Celkem", trida: "cisla" }],
+            { nazev: "Celkem", trida: "cisla" }, { nazev: "", trida: "uzke netisknout" }],
           radky,
         })
         + `</div>`
         + `<div class="prazdno" data-prazdno hidden>${ikona("hledat")}<strong>Nic se nenašlo</strong></div>`,
       tesne: true,
       pata: "Faktura se dělá z přijaté nabídky, takže se položky nepřepisují podruhé. "
-        + "Variabilní symbol se bere z čísla faktury.",
+        + "Variabilní symbol se bere z čísla faktury. Zaplacenou fakturu označíte "
+        + "fajfkou v řádku — čísla nahoře se přepočítají hned.",
     })
-    + poznamka("Předání do účetnictví se dá dodělat podle toho, co vaše účetní používá — "
-      + "buď exportem souboru, nebo přímým napojením.");
+    + poznamka("Export pro účetní stáhne tabulku se středníky, kterou otevře Excel "
+      + "i účetní program. Přímé napojení se dá dodělat podle toho, co vaše účetní používá.");
 
   return {
     titulek: "Faktury",

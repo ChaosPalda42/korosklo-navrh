@@ -4,12 +4,14 @@
  */
 
 import { polozkaCelkem, souhrn } from "./lib/nabidka.mjs";
-import { koruny, datum, datumKratce } from "./lib/cestina.mjs";
+import { koruny, datum, datumKratce, sMnoznym } from "./lib/cestina.mjs";
 import { kdy } from "./lib/kdy.mjs";
 import { postup, pocty, filtruj, dalsiStav, zmenStav, oznacKrok, STAVY }
   from "./lib/zakazky.mjs";
 import { STITKY, prijmi, pocty as poctyPriloh, serad as seradPrilohy, velikost }
   from "./lib/prilohy.mjs";
+import { stavFaktury, dnuPoSplatnosti, prehled } from "./lib/faktura.mjs";
+import { oznacZaplacenou, vystav, csvProUcetni, nazevSouboru } from "./lib/platba.mjs";
 
 /** Den, ke kterému je ukázka postavená (sestavení ho dá do <body>). */
 const DNES = document.body.dataset.dnes || new Date().toISOString().slice(0, 10);
@@ -706,7 +708,219 @@ function zakazky() {
   }
 }
 
+/* ---------------------------------------------------------------- faktury */
+
+/** Názvy a barvy stavů faktur — stejný slovník jako v šabloně. */
+const STAV_FAKTURY = {
+  navrh: ["Návrh", ""],
+  vystavena: ["Vystavená", "modra"],
+  "po-splatnosti": ["Po splatnosti", "cervena"],
+  zaplacena: ["Zaplacená", "zelena"],
+};
+
+const DNY = ["den", "dny", "dní"];
+const FAKTURY = ["faktura", "faktury", "faktur"];
+
+/** Faktura, jak ji zrovna vidí stránka — čte se z atributů prvku. */
+function fakturaZPrvku(el) {
+  return {
+    cislo: el.dataset.faktura,
+    klient: el.dataset.klient ?? "",
+    popis: el.dataset.popis ?? "",
+    celkem: Number(el.dataset.celkem ?? 0),
+    vystaveno: el.dataset.vystaveno ?? "",
+    splatnost: el.dataset.splatnost ?? "",
+    zaplaceno: el.dataset.zaplaceno ?? "",
+    stav: el.dataset.vlastniStav,
+  };
+}
+
+/** Všechny faktury na stránce, v pořadí, jak jsou v seznamu. */
+function fakturyZeStranky(obal) {
+  return [...obal.querySelectorAll("[data-faktura]")].map((el) => ({ el, ...fakturaZPrvku(el) }));
+}
+
+/** Zapíše fakturu zpátky do atributů prvku. */
+function doPrvku(el, f) {
+  el.dataset.vlastniStav = f.stav;
+  el.dataset.vystaveno = f.vystaveno ?? "";
+  el.dataset.splatnost = f.splatnost ?? "";
+  el.dataset.zaplaceno = f.zaplaceno ?? "";
+  el.dataset.stav = stavFaktury(f, DNES);
+}
+
+/** Datum do prvku: na dokladu celé (data-dlouhe), v tabulce bez roku. */
+function napisDatum(iso, prvek) {
+  if (!iso) return "—";
+  return prvek.dataset.dlouhe === undefined ? datumKratce(iso) : datum(iso);
+}
+
+/** Překreslí odznak, data a počet dní po splatnosti. */
+function prekresliFakturu(el, f) {
+  const stav = stavFaktury(f, DNES);
+  const [nazev, barva] = STAV_FAKTURY[stav] ?? [stav, ""];
+  const misto = el.querySelector("[data-odznak]");
+  if (misto) {
+    misto.innerHTML = `<span class="odznak${barva ? ` odznak--${barva}` : ""}">${nazev}</span>`;
+  }
+  for (const x of el.querySelectorAll("[data-vystaveno-text]")) {
+    x.textContent = napisDatum(f.vystaveno, x);
+  }
+  for (const x of el.querySelectorAll("[data-splatnost-text]")) {
+    x.textContent = napisDatum(f.splatnost, x);
+  }
+  const po = el.querySelector("[data-po-splatnosti]");
+  if (po) {
+    const d = dnuPoSplatnosti(f, DNES);
+    po.textContent = d ? `+${sMnoznym(d, DNY)}` : "";
+    po.hidden = !d;
+  }
+}
+
+/** Tlačítka podle stavu: vystavit jen u návrhu, zaplaceno u vystavené. */
+function nastavTlacitka(kde, f) {
+  for (const tl of kde.querySelectorAll("[data-tl-vystavit]")) {
+    tl.hidden = f.stav !== "navrh";
+  }
+  for (const tl of kde.querySelectorAll("[data-tl-zaplaceno]")) {
+    tl.hidden = f.stav === "navrh" || f.stav === "zaplacena";
+  }
+}
+
+/** Dlaždice nahoře — počítá je stejný modul jako sestavení. */
+function prekresliPrehledFaktur(obal) {
+  const mriz = document.querySelector("[data-prehled]");
+  if (!mriz) return;
+  const p = prehled(fakturyZeStranky(obal), DNES);
+  const sucty = {
+    zaplaceno: p.zaplaceno,
+    nezaplaceno: p.nezaplaceno,
+    poSplatnosti: p.poSplatnosti,
+  };
+  for (const [klic, hodnota] of Object.entries(sucty)) {
+    const x = mriz.querySelector(`[data-sucet="${klic}"]`);
+    if (x) x.textContent = koruny(hodnota);
+  }
+  const pocty = {
+    zaplacena: p.pocty.zaplacena,
+    nezaplacene: p.pocty.vystavena + p.pocty["po-splatnosti"],
+    "po-splatnosti": p.pocty["po-splatnosti"],
+  };
+  for (const [klic, kolik] of Object.entries(pocty)) {
+    const x = mriz.querySelector(`[data-pocet="${klic}"]`);
+    if (x) x.textContent = sMnoznym(kolik, FAKTURY);
+  }
+}
+
+/** Pruh nad dokladem na detailu faktury. */
+function prekresliPruhFaktury(f) {
+  const pruh = document.querySelector("[data-pruh]");
+  const text = pruh?.querySelector("[data-pruh-text]");
+  if (!pruh || !text) return;
+  const stav = stavFaktury(f, DNES);
+  if (stav === "zaplacena") {
+    pruh.className = "platnost platnost--plati netisknout";
+    text.innerHTML = `Zaplaceno <strong>${datum(f.zaplaceno)}</strong>`
+      + (f.splatnost ? ` — splatnost byla ${datum(f.splatnost)}.` : ".");
+    return;
+  }
+  if (stav === "po-splatnosti") {
+    pruh.className = "platnost platnost--prosla netisknout";
+    text.innerHTML = `Po splatnosti o <strong>${sMnoznym(dnuPoSplatnosti(f, DNES), DNY)}</strong>`
+      + ` — splatnost byla ${datum(f.splatnost)}. Na tuhle zavolat.`;
+    return;
+  }
+  pruh.className = "platnost platnost--plati netisknout";
+  text.innerHTML = `Splatnost <strong>${datum(f.splatnost)}</strong>`
+    + ` — vystaveno ${datum(f.vystaveno)}.`;
+}
+
+/** Stáhne tabulku pro účetní. Soubor vznikne v prohlížeči, nikam se neposílá. */
+function exportUcetni(obal) {
+  const faktury = fakturyZeStranky(obal).map(({ el, ...f }) => f);
+  const text = csvProUcetni(faktury);
+  const soubor = new Blob(["﻿" + text], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(soubor);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nazevSouboru(DNES);
+  a.click();
+  URL.revokeObjectURL(url);
+  hlaska(`Stahuje se ${a.download} — ${sMnoznym(faktury.length, FAKTURY)} pro účetní. `
+    + "Středníky a desetinná čárka, ať to otevře Excel.");
+}
+
+/** Jedna změna stavu faktury: přepočítá prvek, dlaždice i pruh na detailu.
+ *  `uklid` je prvek, ve kterém se odebírají tlačítka, co už nemají co dělat —
+ *  v seznamu jen ten jeden řádek, na detailu celá stránka. */
+function zmenFakturu(prvek, { obal = null, uklid = prvek, jak }) {
+  const f = fakturaZPrvku(prvek);
+  let zmenena;
+  try {
+    zmenena = jak(f);
+  } catch (chyba) {
+    hlaska(chyba.message);
+    return null;
+  }
+  doPrvku(prvek, zmenena);
+  prekresliFakturu(prvek, zmenena);
+  nastavTlacitka(uklid, zmenena);
+  if (obal) prekresliPrehledFaktur(obal);
+  prekresliPruhFaktury(zmenena);
+  return zmenena;
+}
+
+/** Kliknutí na „zaplaceno" a „vystavit"; `kde` je prvek, kde se klikání poslouchá. */
+function fakturyAkce(kde, { najdiPrvek, obal = null, celaStranka = false }) {
+  kde.addEventListener("click", (e) => {
+    const zaplaceno = e.target.closest("[data-tl-zaplaceno]");
+    const vystavit = e.target.closest("[data-tl-vystavit]");
+    if (!zaplaceno && !vystavit) return;
+    const prvek = najdiPrvek(e);
+    if (!prvek) return;
+    const volby = { obal, uklid: celaStranka ? document : prvek };
+
+    if (zaplaceno) {
+      const zmenena = zmenFakturu(prvek, { ...volby, jak: (f) => oznacZaplacenou(f, DNES) });
+      if (zmenena) {
+        hlaska(`Faktura ${zmenena.cislo} je zaplacená ${datum(DNES)}. `
+          + "V ostré verzi by se k ní zapsala i platba z banky.");
+      }
+      return;
+    }
+
+    const zmenena = zmenFakturu(prvek, {
+      ...volby,
+      jak: (f) => vystav(f, { kdy: DNES, splatnostDnu: 14 }),
+    });
+    if (zmenena) {
+      hlaska(`Faktura ${zmenena.cislo} je vystavená ${datum(DNES)}, `
+        + `splatnost ${datum(zmenena.splatnost)}. Odsud by odešla klientovi e-mailem.`);
+    }
+  });
+}
+
+function faktury() {
+  const seznam = document.querySelector("#seznam-faktur");
+  if (seznam) {
+    fakturyAkce(seznam, { najdiPrvek: (e) => e.target.closest("[data-faktura]"), obal: seznam });
+    for (const tl of document.querySelectorAll("[data-export-ucetni]")) {
+      tl.addEventListener("click", () => exportUcetni(seznam));
+    }
+    prekresliPrehledFaktur(seznam);
+  }
+
+  const doklad = document.querySelector(".dokument[data-faktura]");
+  if (doklad) {
+    fakturyAkce(document, { najdiPrvek: () => doklad, celaStranka: true });
+    for (const tl of document.querySelectorAll("[data-tisk]")) {
+      tl.addEventListener("click", () => window.print());
+    }
+  }
+}
+
 /* ------------------------------------------------------------------ start */
+
 
 panel();
 filtry();
@@ -714,3 +928,4 @@ ukladani();
 fotky();
 nabidka();
 zakazky();
+faktury();

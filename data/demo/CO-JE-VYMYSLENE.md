@@ -37,16 +37,21 @@ a jak by se v tom pracovalo, ne o skutečné zákazníky.
 - **16 příloh u zakázek** — jen jména souborů se štítky (smlouva, zaměření,
   návrh, fotka, atest). Žádné soubory v ukázce nejsou a nic se nenahrává.
 - **16 skladových karet** a 8 pohybů na skladě.
-- **8 faktur** včetně částek a splatností.
+- **8 faktur** včetně částek, položek a splatností. Každá má svůj doklad
+  k tisku s rozpisem DPH.
+- **Číslo účtu 123456789/0800** na fakturách je zástupné. IBAN se z něj
+  počítá, takže jakmile dodáte svoje číslo, přepočítá se samo.
 
 Ceny v nabídkách jsou nastavené tak, aby čísla vypadala rozumně, ale nejsou
 to vaše ceny. Před ostrým provozem se naplní vaše.
 
 ## Co v ukázce nefunguje
 
-- **Nic se neukládá.** Změny textů, přesuny fotek, úpravy nabídky i posun,
-  úprava a smazání zakázky žijí jen do obnovení stránky — ukázka je statická,
-  bez serveru a bez databáze.
+- **Nic se neukládá.** Změny textů, přesuny fotek, úpravy nabídky, posun,
+  úprava a smazání zakázky i vystavení a zaplacení faktury žijí jen
+  do obnovení stránky — ukázka je statická, bez serveru a bez databáze.
+- **Export pro účetní** si soubor poskládá přímo v prohlížeči a nikam ho
+  neposílá. Je to obyčejná tabulka se středníky, kterou otevře i Excel.
 - **Poptávkový formulář na webu neposílá e-mail.** Ukáže jen hlášku, co by se stalo.
 - **Přihlášení do administrace nic nekontroluje.** Stačí kliknout na *Přihlásit se*.
 - **Tisk nabídky** používá tiskový dialog prohlížeče (odtud se dělá i PDF).

@@ -35,6 +35,7 @@ const demo = {
   zakazky: nacti("demo/zakazky.json"),
   sklad: nacti("demo/sklad.json"),
   faktury: nacti("demo/faktury.json"),
+  platba: nacti("demo/platba.json"),
   statistiky: nacti("demo/statistiky.json"),
 };
 
@@ -84,6 +85,10 @@ const strankyAdmin = [
   ...demo.nabidky.map((n) => [
     `administrace/crm/nabidka-${n.cislo}.html`,
     (ctx) => crm.nabidkaDetail(ctx, n),
+  ]),
+  ...demo.faktury.map((f) => [
+    `administrace/crm/faktura-${f.cislo}.html`,
+    (ctx) => crm.fakturaDetail(ctx, f),
   ]),
 ];
 

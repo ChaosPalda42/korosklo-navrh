@@ -93,3 +93,34 @@ na první pohled vidět, co v příloze je.
 - V ukázce se nic nenahrává: hlášky říkají, co by se stalo. Hlídá to
   `tests/test_predavka.py`, kde je nově i počet příloh proti
   `data/demo/zakazky.json`.
+
+## 2026-11-12 — faktury: doklad, vystavení, zaplacení, export
+
+Zadání: ukázka faktur. Druhá polovina zadání z 12. 11.
+
+- Logika je kontrakt **C-008** `src/lib/platba.mjs`: IBAN z českého čísla
+  účtu (kontrolní číslice mod 97 po blocích), `vystav` (stav, datum,
+  splatnost přes `posunDnu`), `oznacZaplacenou` a CSV pro účetní
+  (středníky, CRLF, datum `d.m.yyyy`, desetinná čárka bez tisíců).
+  Factory zelená na čtvrté iteraci, 306 testů.
+- Každá z osmi faktur má **svůj doklad k tisku** `faktura-<číslo>.html`
+  s dodavatelem, odběratelem, položkami, rozpisem DPH a platebními údaji
+  včetně IBAN. Čísla na dokladu počítá `souhrn` z `nabidka.mjs` — ten samý
+  kód jako u nabídek.
+- Faktury dostaly položky (`data/demo/faktury.json`), takže částka už není
+  ručně napsané číslo: `tests/test_predavka.py` ji přepočítává z položek.
+- Seznam umí **vystavit návrh** a **označit zaplacenou**; dlaždice
+  (po splatnosti / vystavené / zaplacené) se přepočítají na místě přes
+  `prehled` z `faktura.mjs`.
+- **Export pro účetní** složí CSV v prohlížeči a nabídne ho ke stažení
+  (`faktury-RRRR-MM-DD.csv`, BOM kvůli Excelu). Nic se nikam neposílá.
+- Číslo účtu v `data/demo/platba.json` je zástupné; předávka to říká
+  a brána hlídá, že se to číslo v předávce opravdu objeví.
+- Při kontrole proti skutečnému modulu se našla **chyba v mém akceptačním
+  testu**: u návrhu jsem v očekávaném řádku CSV nechal prázdné pole Klient,
+  takže modul klienta u návrhů zahazoval. Test je opravený a přibyl k němu
+  druhý, který tvrdí, že stav na jméno klienta nesmí sahat. Modul to opraví
+  Factory dalším během C-008.
+- Opravená i stará chyba v `crm.mjs`: hlavička dodavatele brala
+  `site.ulice/psc/mesto/ico`, které v `site.json` nejsou, takže na nabídce
+  byla prázdná adresa a „IČ “. Teď to sází jeden společný `znackaDodavatele`.
