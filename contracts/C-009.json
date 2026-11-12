@@ -7,9 +7,18 @@
   "uses": {
     "src/lib/nabidka.mjs": "souhrn(nabidka)"
   },
+  "database": "",
   "acceptance": "tests/test_fakturace.py",
-  "notes": "ESM modul s jediným importem z ./nabidka.mjs. Musí běžet v Node 24 i v prohlížeči: žádné `require`, žádné Node API (fs, path, process, Buffer), žádné DOM API (document, window, fetch), žádné knihovny. Datum se tady nepočítá — návrh faktury je zatím bez data vystavení a splatnosti, ty dosadí až vystavení (C-008 `vystav`). Hluboká kopie položek klidně přes JSON.parse(JSON.stringify(...)). Číslo faktury se skládá jen z roku a pořadí, žádné jiné znaky.",
+  "dobehly": "",
+  "forbidden": [],
+  "depends_on": [],
   "budget": {
     "iterations": 12
-  }
+  },
+  "metamorfni_funkce": "",
+  "neutralni_upravy": [],
+  "neutralni_predpony": [],
+  "differential": false,
+  "differential_compare": "exact",
+  "notes": "ESM modul s jediným importem z ./nabidka.mjs. Musí běžet v Node 24 i v prohlížeči: žádné `require`, žádné Node API (fs, path, process, Buffer), žádné DOM API (document, window, fetch), žádné knihovny. Datum se tady nepočítá — návrh faktury je zatím bez data vystavení a splatnosti, ty dosadí až vystavení (C-008 `vystav`). Hluboká kopie položek klidně přes JSON.parse(JSON.stringify(...)). Číslo faktury se skládá jen z roku a pořadí, žádné jiné znaky."
 }
