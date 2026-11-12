@@ -325,7 +325,16 @@ def test_csv_chybejici_datum_je_prazdne(js):
         "out(m.csvProUcetni([A.f]));",
         f=f(cislo="2026-0116", stav="navrh", vystaveno="", splatnost=""),
     )
-    assert text.split(CRLF)[1].startswith("2026-0116;20260116;;Zábradlí;;;;Návrh;")
+    assert text.split(CRLF)[1].startswith("2026-0116;20260116;K-0042;Zábradlí;;;;Návrh;")
+
+
+def test_csv_navrh_si_klienta_drzi(js):
+    """Stav faktury nesmí nijak sahat na jméno klienta."""
+    text = js(
+        "out(m.csvProUcetni([A.f], { klienti: { 'K-0042': 'Jan Novák' } }));",
+        f=f(stav="navrh", vystaveno="", splatnost=""),
+    )
+    assert ";Jan Novák;" in text
 
 
 def test_csv_neznamy_klient_projde_jak_je(js):
