@@ -130,6 +130,32 @@ def test_kazda_faktura_ma_svuj_doklad(text: str) -> None:
     )
 
 
+def test_zakazky_a_faktury_sedi_na_nabidky() -> None:
+    """Faktura ze zakázky se pozná přes nabídku — ať ta vazba v datech drží."""
+    nabidky = {n["cislo"] for n in nacti("demo/nabidky.json")}
+    for z in nacti("demo/zakazky.json"):
+        assert z["nabidka"] in nabidky, (
+            f"zakázka {z['id']} ukazuje na nabídku {z['nabidka']}, která není v datech"
+        )
+    zNabidek = [f["zNabidky"] for f in nacti("demo/faktury.json") if f.get("zNabidky")]
+    for cislo_nabidky in zNabidek:
+        assert cislo_nabidky in nabidky, (
+            f"faktura ukazuje na nabídku {cislo_nabidky}, která není v datech"
+        )
+    assert len(zNabidek) == len(set(zNabidek)), (
+        "dvě faktury z jedné nabídky — zakázka by pak nevěděla, která je její"
+    )
+
+
+def test_faktura_ze_zakazky_je_v_kodu(text: str) -> None:
+    """Předávka slibuje fakturu rovnou ze zakázky — ať ji administrace umí."""
+    assert "Z řádku zakázky se dá udělat faktura" in text
+    sablona = (ROOT / "src" / "templates" / "crm.mjs").read_text(encoding="utf8")
+    assert "data-fakturovat" in sablona, "v zakázkách není tlačítko na fakturu"
+    skript = (ROOT / "src" / "assets" / "admin.js").read_text(encoding="utf8")
+    assert "zeZakazky" in skript, "administrace nevolá modul, který fakturu ze zakázky udělá"
+
+
 def test_den_ukazky_souhlasi_s_sestavenim(text: str) -> None:
     """Datum v předávce = DNES v build.mjs (ukázka je postavená k tomu dni)."""
     build = (ROOT / "build.mjs").read_text(encoding="utf8")

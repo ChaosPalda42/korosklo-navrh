@@ -12,6 +12,7 @@ import { stavKarty, podLimitem, hodnotaSkladu } from "../lib/sklad.mjs";
 import { stavFaktury, dnuPoSplatnosti, prehled, variabilniSymbol } from "../lib/faktura.mjs";
 import { iban } from "../lib/platba.mjs";
 import { postup, pocty, serad, jeVBehu } from "../lib/zakazky.mjs";
+import { fakturaZakazky } from "../lib/fakturace.mjs";
 import { STITKY, serad as seradPrilohy, pocty as poctyPriloh, velikost }
   from "../lib/prilohy.mjs";
 import { kdy } from "../lib/kdy.mjs";
@@ -61,6 +62,22 @@ const STAVY_FAKTUR = {
   "po-splatnosti": ["Po splatnosti", "cervena"],
   zaplacena: ["Zaplacená", "zelena"],
 };
+
+/** Data pro prohlížeč: stránka si je přečte a pustí nad nimi ty samé moduly
+ *  z `src/lib`, co je použilo sestavení. Nic se neposílá, nic se neukládá. */
+function jsonData(jmeno, hodnota) {
+  if (hodnota == null) return "";
+  const text = JSON.stringify(hodnota).replace(/</g, "\\u003c");
+  return `<script type="application/json" data-${jmeno}>${text}</script>`;
+}
+
+/** Odkaz na fakturu zakázky i s odznakem stavu, nebo pomlčka. */
+function odkazNaFakturu(stranka, faktura, dnes) {
+  if (!faktura) return "—";
+  return `<a href="${odkaz(stranka, `administrace/crm/faktura-${faktura.cislo}.html`)}">`
+    + `${h(faktura.cislo)}</a> `
+    + odznakZeSlovniku(STAVY_FAKTUR, stavFaktury(faktura, dnes));
+}
 
 function odznakZeSlovniku(slovnik, stav) {
   const [nazev, barva] = slovnik[stav] ?? [stav, ""];
@@ -453,7 +470,11 @@ export function zakazky(ctx) {
     pata: "Hotové zakázky se schovají samy — filtr nahoře je kdykoli vytáhne zpátky. "
       + "Stav se dá přepnout přímo v řádku, krok odškrtnout kliknutím. "
       + "Přílohy se štítkem drží smlouvu, zaměření i fotky u jedné zakázky.",
-  }) + vzorPrilohy();
+  }) + vzorPrilohy() + jsonData("faktury-json", demo.faktury.map((f) => ({
+    cislo: f.cislo,
+    zNabidky: f.zNabidky ?? null,
+    stav: f.stav,
+  })));
 
   return {
     titulek: "Zakázky",
@@ -469,9 +490,11 @@ export function zakazky(ctx) {
 
 /** Jeden rozkládací řádek zakázky i s úpravami, stavem a mazáním. */
 function zakazkaRadek(ctx, z) {
-  const { stranka, dnes } = ctx;
+  const { stranka, dnes, demo } = ctx;
   const k = klient(ctx, z.klient);
   const stav = postup(z);
+  const fakturaZ = fakturaZakazky(z, demo.faktury);
+  const nabidkaZ = demo.nabidky.find((n) => n.cislo === z.nabidka) ?? null;
 
   const hlavni = `<strong>${h(z.id)} — <span data-zobraz="nazev">${h(z.nazev)}</span></strong>`
     + `<span class="tabulka__pod">${h(k?.jmeno ?? "—")}</span>`;
@@ -503,6 +526,7 @@ function zakazkaRadek(ctx, z) {
     ["Z nabídky", z.nabidka
       ? `<a href="${odkaz(stranka, `administrace/crm/nabidka-${z.nabidka}.html`)}">${h(z.nabidka)}</a>`
       : "—"],
+    ["Faktura", `<span data-faktura-pole>${odkazNaFakturu(stranka, fakturaZ, dnes)}</span>`],
     ["Zahájeno", h(datum(z.zahajeno))],
     ["Montáž", `<span data-zobraz="terminDatum">${h(datum(z.terminMontaze))}</span> `
       + `<span class="tabulka__pod" data-zobraz="terminPred">${h(kdy(z.terminMontaze, dnes))}</span>`],
@@ -531,6 +555,8 @@ function zakazkaRadek(ctx, z) {
   <label class="jen-pro-cteni" for="stav-${h(z.id)}">Stav zakázky</label>
   <select id="stav-${h(z.id)}" data-stav-volba>${moznosti}</select>
   <button type="button" class="tl tl--maly" data-dal>Posunout dál</button>
+  <button type="button" class="tl tl--maly" data-fakturovat${fakturaZ ? " hidden" : ""}>`
+    + `${ikona("faktury")} Vystavit fakturu</button>
   <span class="akce-radku__mezera"></span>
   <button type="button" class="tl tl--maly" data-upravit>${ikona("tuzka")} Upravit</button>
   <button type="button" class="tl tl--maly tl--nebezpecny" data-smazat>${ikona("koš")} Smazat</button>
@@ -540,13 +566,25 @@ function zakazkaRadek(ctx, z) {
   <p>Opravdu zakázku smazat? V ostré verzi se přesune do archivu a jde vrátit zpátky.</p>
   <button type="button" class="tl tl--maly tl--nebezpecny" data-smazat-ano>Ano, smazat</button>
   <button type="button" class="tl tl--maly" data-smazat-ne>Nechat</button>
+</div>
+<div class="potvrzeni netisknout" data-fakturovat-potvrzeni hidden>
+  ${ikona("pozor")}
+  <p data-fakturovat-duvod></p>
+  <button type="button" class="tl tl--maly tl--hlavni" data-fakturovat-ano>Přesto vystavit</button>
+  <button type="button" class="tl tl--maly" data-fakturovat-ne>Zatím ne</button>
 </div>`;
 
   const prilohyHtml = prilohySekce(z);
 
   const telo = akce + prehledHtml + uprava
     + `<p class="ryska" style="margin-top:1.25rem">Kde to stojí</p>`
-    + postupHtml + prilohyHtml;
+    + postupHtml + prilohyHtml + jsonData("nabidka-json", nabidkaZ && {
+      cislo: nabidkaZ.cislo,
+      klient: nabidkaZ.klient,
+      platceDph: nabidkaZ.platceDph,
+      zaokrouhlit: nabidkaZ.zaokrouhlit,
+      polozky: nabidkaZ.polozky,
+    });
 
   const proHledani = [z.id, z.nazev, z.nabidka, z.poznamka, k?.jmeno, k?.mesto]
     .filter(Boolean).join(" ");
@@ -563,6 +601,7 @@ function zakazkaRadek(ctx, z) {
       "data-nazev": z.nazev,
       "data-poznamka": z.poznamka || "",
       "data-nabidka": z.nabidka || "",
+      "data-klient": z.klient || "",
     },
   });
 }

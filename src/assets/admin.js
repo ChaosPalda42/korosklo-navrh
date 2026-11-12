@@ -12,6 +12,7 @@ import { STITKY, prijmi, pocty as poctyPriloh, serad as seradPrilohy, velikost }
   from "./lib/prilohy.mjs";
 import { stavFaktury, dnuPoSplatnosti, prehled } from "./lib/faktura.mjs";
 import { oznacZaplacenou, vystav, csvProUcetni, nazevSouboru } from "./lib/platba.mjs";
+import { lzeFakturovat, zeZakazky } from "./lib/fakturace.mjs";
 
 /** Den, ke kterému je ukázka postavená (sestavení ho dá do <body>). */
 const DNES = document.body.dataset.dnes || new Date().toISOString().slice(0, 10);
@@ -449,6 +450,33 @@ function zakazkyAkce(obal) {
       return;
     }
 
+    /* faktura ze zakázky */
+    if (e.target.closest("[data-fakturovat]")) {
+      const kontrola = lzeFakturovat(zakazkaZPrvku(radek), fakturyProZakazky());
+      if (!kontrola.muze) {
+        hlaska(kontrola.duvod);
+        return;
+      }
+      if (kontrola.varovani) {
+        const potvrzeni = radek.querySelector("[data-fakturovat-potvrzeni]");
+        potvrzeni.querySelector("[data-fakturovat-duvod]").textContent =
+          `${kontrola.varovani} Fakturu můžete vystavit i tak.`;
+        potvrzeni.hidden = false;
+        return;
+      }
+      fakturujZakazku(radek);
+      return;
+    }
+    if (e.target.closest("[data-fakturovat-ne]")) {
+      radek.querySelector("[data-fakturovat-potvrzeni]").hidden = true;
+      return;
+    }
+    if (e.target.closest("[data-fakturovat-ano]")) {
+      radek.querySelector("[data-fakturovat-potvrzeni]").hidden = true;
+      fakturujZakazku(radek);
+      return;
+    }
+
     /* úprava */
     if (e.target.closest("[data-upravit]")) {
       radek.querySelector("[data-uprava]").hidden = false;
@@ -691,6 +719,70 @@ function prilohyAkce(obal) {
       }
     });
   }
+}
+
+/* ------------------------------------------- faktura rovnou ze zakázky */
+
+/** JSON schovaný ve stránce — data, ze kterých sestavení stavělo. */
+function jsonZPrvku(el) {
+  if (!el) return null;
+  try {
+    return JSON.parse(el.textContent);
+  } catch {
+    return null;
+  }
+}
+
+/** Faktury, jak je zná stránka zakázek. Co tady přibude, platí do obnovení. */
+let fakturyStranky = null;
+
+function fakturyProZakazky() {
+  if (!fakturyStranky) {
+    fakturyStranky = jsonZPrvku(document.querySelector("[data-faktury-json]")) ?? [];
+  }
+  return fakturyStranky;
+}
+
+function zakazkaZPrvku(radek) {
+  return {
+    id: radek.dataset.zakazka,
+    nabidka: radek.dataset.nabidka || "",
+    klient: radek.dataset.klient || "",
+    nazev: radek.dataset.nazev || "",
+    stav: radek.dataset.stav,
+  };
+}
+
+/** Udělá ze zakázky návrh faktury — stejným modulem, jakým by to udělal server. */
+function fakturujZakazku(radek) {
+  const nabidka = jsonZPrvku(radek.querySelector("[data-nabidka-json]"));
+  let faktura;
+  try {
+    faktura = zeZakazky(zakazkaZPrvku(radek), {
+      nabidka,
+      faktury: fakturyProZakazky(),
+      rok: DNES.slice(0, 4),
+    });
+  } catch (chyba) {
+    hlaska(chyba.message);
+    return;
+  }
+
+  fakturyProZakazky().push(faktura);
+  const pole = radek.querySelector("[data-faktura-pole]");
+  if (pole) {
+    pole.textContent = "";
+    const cislo = document.createElement("strong");
+    cislo.textContent = faktura.cislo;
+    const odznak = document.createElement("span");
+    odznak.className = "odznak";
+    odznak.textContent = "Návrh";
+    pole.append(cislo, " ", odznak);
+  }
+  const tlacitko = radek.querySelector("[data-fakturovat]");
+  if (tlacitko) tlacitko.hidden = true;
+  hlaska(`Faktura ${faktura.cislo} je připravená jako návrh na ${koruny(faktura.celkem)}`
+    + " — položky se vzaly z nabídky. V ostré verzi by se rovnou otevřela k vystavení.");
 }
 
 function zakazky() {

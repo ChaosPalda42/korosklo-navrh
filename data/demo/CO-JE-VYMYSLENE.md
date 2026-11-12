@@ -38,7 +38,8 @@ a jak by se v tom pracovalo, ne o skutečné zákazníky.
   návrh, fotka, atest). Žádné soubory v ukázce nejsou a nic se nenahrává.
 - **16 skladových karet** a 8 pohybů na skladě.
 - **8 faktur** včetně částek, položek a splatností. Každá má svůj doklad
-  k tisku s rozpisem DPH.
+  k tisku s rozpisem DPH. Z řádku zakázky se dá udělat faktura rovnou —
+  položky i klient se vezmou z nabídky, číslo se přidělí další volné.
 - **Číslo účtu 123456789/0800** na fakturách je zástupné. IBAN se z něj
   počítá, takže jakmile dodáte svoje číslo, přepočítá se samo.
 
@@ -48,8 +49,9 @@ to vaše ceny. Před ostrým provozem se naplní vaše.
 ## Co v ukázce nefunguje
 
 - **Nic se neukládá.** Změny textů, přesuny fotek, úpravy nabídky, posun,
-  úprava a smazání zakázky i vystavení a zaplacení faktury žijí jen
-  do obnovení stránky — ukázka je statická, bez serveru a bez databáze.
+  úprava a smazání zakázky, faktura udělaná ze zakázky i vystavení
+  a zaplacení faktury žijí jen do obnovení stránky — ukázka je statická,
+  bez serveru a bez databáze.
 - **Export pro účetní** si soubor poskládá přímo v prohlížeči a nikam ho
   neposílá. Je to obyčejná tabulka se středníky, kterou otevře i Excel.
 - **Poptávkový formulář na webu neposílá e-mail.** Ukáže jen hlášku, co by se stalo.

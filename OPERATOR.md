@@ -128,3 +128,26 @@ Zadání: ukázka faktur. Druhá polovina zadání z 12. 11.
   je pomlčka) — jinak by řádek tvrdil „vystaveno 10. 11.“ a zároveň nabízel
   tlačítko *Vystavit*. Datum dosadí až vystavení. V historii klienta se
   nevystavená faktura neukazuje.
+
+## 2026-11-12 — fakturu lze vystavit přímo ze zakázky
+
+Zadání: *„Já bych chtěl mít možnost vytvořit tu fakturu přímo ze zakázky.."*
+
+- Logika je kontrakt **C-009** `src/lib/fakturace.mjs`: `dalsiCislo` (další
+  volné číslo v roce ve tvaru RRRR-NNNN), `fakturaZakazky` (která faktura už
+  ze zakázky vznikla), `lzeFakturovat` (důvod, proč ne, a varování u nehotové
+  zakázky) a `zeZakazky` (návrh faktury — klient, popis a hluboká kopie
+  položek z nabídky, celkem přes `souhrn`). Factory zelená na pátou iteraci,
+  377 testů.
+- Řádek zakázky má v přehledu nové pole **Faktura**: číslo s odznakem stavu
+  a prokliknutím na doklad, nebo pomlčku. Dokud faktura není, je v akcích
+  tlačítko *Vystavit fakturu*; u nehotové zakázky se nejdřív zeptá
+  („obvykle se fakturuje až po předání“) a jde to potvrdit.
+- Prohlížeč bere `zeZakazky` z `assets/lib/fakturace.mjs`, takže částka na
+  nové faktuře vyjde stejně jako na dokladu ze sestavení. Ověřeno na
+  Z-2026-0030: nová faktura 2026-0116 na 114 363 Kč = `souhrn` nabídky
+  2026-0041.
+- Číslo se nepřidělí dvakrát: `dalsiCislo` kouká na čísla faktur, která
+  stránka nese v `faktury-json`. Brána navíc hlídá, že žádné dvě faktury
+  nevznikly z jedné nabídky a že každá zakázka míří na existující nabídku.
+- Ukázka nic neukládá — předávka to říká i o faktuře udělané ze zakázky.
